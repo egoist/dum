@@ -1,3 +1,5 @@
+mod install;
+
 use serde_json::Value;
 use std::collections::HashMap;
 use std::env;
@@ -39,6 +41,25 @@ fn main() {
         } else {
             println!("No scripts found.");
         }
+        return;
+    }
+
+    // Run npm install if the script_name is "install"
+    if args.script_name == "install" {
+        let pm = install::guess_package_manager(&execute_dir);
+
+        if pm.is_none() {
+            eprintln!("No package manager found.");
+            exit(1);
+        }
+
+        run_command(
+            &[&pm.unwrap(), "install"],
+            &RunOptions {
+                current_dir: execute_dir,
+                envs: HashMap::new(),
+            },
+        );
         return;
     }
 
@@ -98,6 +119,11 @@ fn parse_args() -> Result<AppArgs, pico_args::Error> {
     // Alias t to test
     if script_name == "t" {
         script_name = "test".to_string();
+    }
+
+    // Alias i to install
+    if script_name == "i" {
+        script_name = "install".to_string();
     }
 
     let args = AppArgs {
@@ -175,7 +201,7 @@ fn run_command(args: &[&str], options: &RunOptions) {
 
     let status = Command::new(sh)
         .arg(sh_flag)
-        .args(args)
+        .arg(args.join(" "))
         .envs(&options.envs)
         .current_dir(&options.current_dir)
         .status()

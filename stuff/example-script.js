@@ -1,1 +1,1 @@
-console.log("from example")
+console.log("from example", process.argv.slice(2))
