@@ -28,6 +28,19 @@ fn main() {
     let contents = read_to_string(pkg_path).expect("failed to read package.json");
     let v: Value = serde_json::from_str(&contents).expect("failed to parse package.json");
 
+    if args.script_name.is_empty() {
+        if let Some(scripts) = v["scripts"].as_object() {
+            println!("\nAvailable scripts:\n");
+            for (name, value) in scripts {
+                println!("{}", name);
+                println!("  {}", value);
+            }
+        } else {
+            println!("No scripts found.");
+        }
+        return;
+    }
+
     println!("> {}", args.script_name);
 
     let result = v
@@ -84,12 +97,6 @@ fn parse_args() -> Result<AppArgs, pico_args::Error> {
             }
             None => break,
         }
-    }
-
-    if script_name.is_empty() {
-        return Err(pico_args::Error::ArgumentParsingFailed {
-            cause: "No script name provided".to_string(),
-        });
     }
 
     let args = AppArgs {
