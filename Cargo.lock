@@ -4,7 +4,7 @@ version = 3
 
 [[package]]
 name = "dum"
-version = "0.1.1"
+version = "0.1.2"
 dependencies = [
  "pico-args",
  "serde_json",
