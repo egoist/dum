@@ -2,7 +2,11 @@
 
 ---
 
-# dum
+<br><br><br><br>
+
+<img src="https://mystickermania.com/cdn/stickers/games/among-us-lime-character-dum.svg" width="200">
+
+<br><br><br><br>
 
 > **dum** replaces `npm run`. Instead of waiting 200ms for your npm client to start, it will start immediately.
 
