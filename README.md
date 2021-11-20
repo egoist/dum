@@ -14,6 +14,10 @@ If you are a Rust user:
 cargo install dum
 ```
 
+## TODO
+
+- Support [package.json vars](https://docs.npmjs.com/cli/v8/using-npm/scripts#packagejson-vars)
+
 ## Sponsors
 
 [![sponsors](https://sponsors-images.egoist.sh/sponsors.svg)](https://github.com/sponsors/egoist)
