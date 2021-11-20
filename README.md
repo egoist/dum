@@ -42,9 +42,9 @@ dum some-npm-script --flags will --be forwareded
 dum --help
 ```
 
-## TODO
+## Limitations
 
-- Support [package.json vars](https://docs.npmjs.com/cli/v8/using-npm/scripts#packagejson-vars)
+- [package.json vars](https://docs.npmjs.com/cli/v8/using-npm/scripts#packagejson-vars) are not supported, I personally never used it, if you believe it's necessary, please [leave a comment here](https://github.com/egoist/dum/issues/2).
 
 ## Inspiration
 
