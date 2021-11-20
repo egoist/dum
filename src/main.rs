@@ -6,7 +6,7 @@ use std::process::{exit, Command};
 
 struct AppArgs {
     script_name: String,
-    remaing_args: Vec<OsString>,
+    remaining: Vec<OsString>,
 }
 
 fn main() {
@@ -29,7 +29,7 @@ fn main() {
         .and_then(|script| script.as_str())
         .map(|script| {
             println!("> {}", script);
-            let remaining = args_to_string(&args.remaing_args);
+            let remaining = args_to_string(&args.remaining);
 
             let (sh, sh_flag) = if cfg!(target_os = "windows") {
                 ("cmd", "/C")
@@ -86,7 +86,7 @@ fn parse_args() -> Result<AppArgs, pico_args::Error> {
 
     let args = AppArgs {
         script_name,
-        remaing_args: pargs.finish(),
+        remaining: pargs.finish(),
     };
 
     Ok(args)
