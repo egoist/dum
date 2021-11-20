@@ -95,6 +95,11 @@ fn parse_args() -> Result<AppArgs, pico_args::Error> {
         }
     }
 
+    // Alias t to test
+    if script_name == "t" {
+        script_name = "test".to_string();
+    }
+
     let args = AppArgs {
         script_name,
         remaining: pargs.finish(),
