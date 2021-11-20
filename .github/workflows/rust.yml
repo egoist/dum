@@ -67,6 +67,7 @@ jobs:
           path: |
             ${{ env.HOME }}/.cargo"
             target
+
       - name: Install cross toolchain (armv7)
         if: ${{ matrix.target == 'armv7-unknown-linux-gnueabihf' }}
         run: sudo apt install gcc-arm-linux-gnueabihf
@@ -76,11 +77,15 @@ jobs:
         run: |
           echo "PKG_CONFIG_ALLOW_CROSS=1" >> $GITHUB_ENV
           echo "LZMA_API_STATIC=1" >> $GITHUB_ENV
+
       - name: Build release
         uses: actions-rs/cargo@v1
+        # TODO: Remove this once it's the default
+        env:
+          SDKROOT: /Library/Developer/CommandLineTools/SDKs/MacOSX11.1.sdk
         with:
           command: build
-          args: --target ${{ matrix.target }} --release
+          args: --target ${{ matrix.target }} --release --locked --features tls-vendored
 
       - name: Copy and rename utility
         run: cp target/${{ matrix.target }}/release/${{ matrix.output }} ${{ matrix.output }}
