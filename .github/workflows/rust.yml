@@ -47,7 +47,8 @@ jobs:
       - name: Configure toolchain
         uses: actions-rs/toolchain@v1
         with:
-          toolchain: nightly
+          toolchain: stable
+          profile: minimal
           target: ${{ matrix.target }}
           override: true
 
