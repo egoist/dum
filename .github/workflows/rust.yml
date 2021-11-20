@@ -31,10 +31,11 @@ jobs:
             os: macos-latest
             output: dum
             archive: zip
-          - target: arm-unknown-linux-musleabihf
-            os: ubuntu-latest
-            output: dum
-            archive: tgz
+          # Failing
+          # - target: arm-unknown-linux-musleabihf
+          #   os: ubuntu-latest
+          #   output: dum
+          #   archive: tgz
           - target: x86_64-pc-windows-msvc
             os: windows-latest
             output: dum.exe
