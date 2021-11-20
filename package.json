@@ -1,0 +1,5 @@
+{
+  "scripts": {
+    "foo": "node stuff/example-script"
+  }
+}
