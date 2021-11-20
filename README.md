@@ -4,7 +4,9 @@
 
 # dum
 
-> **dum** replaces `npm run`.
+> **dum** replaces `npm run`. Instead of waiting 200ms for your npm client to start, it will start immediately.
+
+<img width="652" alt="CleanShot 2021-11-20 at 15 23 54@2x" src="https://user-images.githubusercontent.com/8784712/142718353-6e6f8327-c27e-404a-866e-6d5af3567cbc.png">
 
 ## Install
 
@@ -21,6 +23,10 @@ PR welcome for adding a shell script so you can install `dum` with a single `cur
 ## TODO
 
 - Support [package.json vars](https://docs.npmjs.com/cli/v8/using-npm/scripts#packagejson-vars)
+
+## Inspiration
+
+Inspired by [bun](https://bun.sh/).
 
 ## Sponsors
 
