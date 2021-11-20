@@ -31,8 +31,8 @@ jobs:
             os: macos-latest
             output: dum
             archive: zip
-          - target: armv7-unknown-linux-gnueabihf
-            os: ubuntu-20.04
+          - target: arm-unknown-linux-musleabihf
+            os: ubuntu-latest
             output: dum
             archive: tgz
           - target: x86_64-pc-windows-msvc
