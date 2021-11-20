@@ -145,8 +145,12 @@ fn args_to_string(args: &Vec<OsString>) -> String {
     s
 }
 
+// Get PATH env and join it with bin_dir
 fn get_path_env(bin_dir: &str) -> String {
-    return [env!("PATH"), bin_dir].join(":");
+    let mut path = env::var("PATH").unwrap_or_default();
+    path.push_str(":");
+    path.push_str(bin_dir);
+    path
 }
 
 fn get_help() -> String {

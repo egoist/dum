@@ -1,3 +1,9 @@
+## v0.1.8
+
+### Fixes
+
+- Fetch `PATH` env at runtime.
+
 ## v0.1.7
 
 - Add command `add`
