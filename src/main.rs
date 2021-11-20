@@ -31,8 +31,13 @@ fn main() {
             println!("> {}", script);
             let remaining = args_to_string(&args.remaing_args);
 
-            let status = Command::new("sh")
-                .arg("-c")
+            let (sh, sh_flag) = if cfg!(target_os = "windows") {
+                ("cmd", "/C")
+            } else {
+                ("sh", "-c")
+            };
+            let status = Command::new(sh)
+                .arg(sh_flag)
                 .arg([script, &remaining].join(" "))
                 .env("PATH", get_path_env())
                 .status()
