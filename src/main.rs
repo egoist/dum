@@ -2,6 +2,7 @@ use serde_json::Value;
 use std::env;
 use std::ffi::OsString;
 use std::fs::read_to_string;
+use std::path::PathBuf;
 use std::process::{exit, Command};
 
 struct AppArgs {
@@ -18,7 +19,13 @@ fn main() {
         }
     };
 
-    let contents = read_to_string("package.json").expect("failed to read package.json");
+    let pkg_path = find_closest_file("package.json").expect("no package.json");
+    // The current_dir to execute npm scripts
+    let execute_dir = PathBuf::from(pkg_path.parent().unwrap());
+    // bin_dir is the dirname of pkg_data followed by node_modules/.bin
+    let bin_dir = PathBuf::from(execute_dir.join("node_modules").join(".bin"));
+
+    let contents = read_to_string(pkg_path).expect("failed to read package.json");
     let v: Value = serde_json::from_str(&contents).expect("failed to parse package.json");
 
     println!("> {}", args.script_name);
@@ -39,7 +46,8 @@ fn main() {
             let status = Command::new(sh)
                 .arg(sh_flag)
                 .arg([script, &remaining].join(" "))
-                .env("PATH", get_path_env())
+                .env("PATH", get_path_env(&bin_dir.to_str().unwrap()))
+                .current_dir(execute_dir)
                 .status()
                 .expect("failed to execute script");
 
@@ -101,8 +109,8 @@ fn args_to_string(args: &Vec<OsString>) -> String {
     s
 }
 
-fn get_path_env() -> String {
-    return [env!("PATH"), &"./node_modules/.bin".to_string()].join(":");
+fn get_path_env(bin_dir: &str) -> String {
+    return [env!("PATH"), bin_dir].join(":");
 }
 
 fn get_help() -> String {
@@ -118,4 +126,29 @@ FLAGS:
 ",
         env!("CARGO_PKG_VERSION")
     )
+}
+
+// A function to find the closest file
+// Starting from current directory
+// Recusively until it finds the file or reach root directory `/`
+fn find_closest_file(name: &str) -> Option<PathBuf> {
+    let mut current_dir = env::current_dir().unwrap();
+    let mut closest_file = None;
+    let stop_dir = "/".to_string();
+
+    loop {
+        let path = current_dir.join(name);
+        if path.exists() {
+            closest_file = Some(PathBuf::from(path.to_str().unwrap()));
+            break;
+        }
+
+        if current_dir.to_str().unwrap() == stop_dir {
+            break;
+        }
+
+        current_dir = current_dir.parent().unwrap().to_path_buf();
+    }
+
+    closest_file
 }
