@@ -1,4 +1,5 @@
 use serde_json::Value;
+use std::collections::HashMap;
 use std::env;
 use std::ffi::OsString;
 use std::fs::read_to_string;
@@ -50,21 +51,16 @@ fn main() {
         .map(|script| {
             println!("> {}", script);
             let remaining = args_to_string(&args.remaining);
+            let envs =
+                HashMap::from([("PATH".to_string(), get_path_env(&bin_dir.to_str().unwrap()))]);
 
-            let (sh, sh_flag) = if cfg!(target_os = "windows") {
-                ("cmd", "/C")
-            } else {
-                ("sh", "-c")
-            };
-            let status = Command::new(sh)
-                .arg(sh_flag)
-                .arg([script, &remaining].join(" "))
-                .env("PATH", get_path_env(&bin_dir.to_str().unwrap()))
-                .current_dir(execute_dir)
-                .status()
-                .expect("failed to execute script");
-
-            exit(status.code().unwrap_or(1));
+            run_command(
+                &[script, &remaining],
+                &RunOptions {
+                    current_dir: execute_dir,
+                    envs,
+                },
+            );
         });
 
     if result.is_none() {
@@ -158,4 +154,27 @@ fn find_closest_file(name: &str) -> Option<PathBuf> {
     }
 
     closest_file
+}
+
+struct RunOptions {
+    envs: HashMap<String, String>,
+    current_dir: PathBuf,
+}
+
+fn run_command(args: &[&str], options: &RunOptions) {
+    let (sh, sh_flag) = if cfg!(target_os = "windows") {
+        ("cmd", "/C")
+    } else {
+        ("sh", "-c")
+    };
+
+    let status = Command::new(sh)
+        .arg(sh_flag)
+        .args(args)
+        .envs(&options.envs)
+        .current_dir(&options.current_dir)
+        .status()
+        .expect("failed to execute the command");
+
+    exit(status.code().unwrap_or(1));
 }
