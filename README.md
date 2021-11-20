@@ -38,7 +38,10 @@ dum some-npm-script
 
 dum some-npm-script --flags will --be forwareded
 
-## More
+# Run `npm i` or `yarn` or `pnpm i` depending on the project
+dum install # or `dum i`
+
+# More
 dum --help
 ```
 
