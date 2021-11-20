@@ -44,40 +44,22 @@ jobs:
       - uses: actions/checkout@v2
       - uses: FranzDiebold/github-env-vars-action@v1.2.1
 
-      - name: Configure toolchain
+      # Cache files between builds
+      - name: Setup | Cache Cargo
+        uses: actions/cache@v2.1.6
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+
+      - name: Setup | Rust
         uses: actions-rs/toolchain@v1
         with:
           toolchain: stable
           profile: minimal
           target: ${{ matrix.target }}
           override: true
-
-      - name: Install openssl (apt armv7)
-        if: ${{ matrix.target == 'armv7-unknown-linux-gnueabihf' }}
-        uses: ryankurte/action-apt@v0.3.0
-        with:
-          arch: armhf
-          packages: libssl-dev:armhf libssl1.1:armhf zlib1g-dev:armhf zlib1g:armhf libc-dev:armhf
-
-      - name: Configure caching
-        uses: actions/cache@v2
-        # Caching disabled on macos due to https://github.com/actions/cache/issues/403
-        if: ${{ matrix.os != 'macos-latest' }}
-        with:
-          key: ${{ matrix.os }}-${{ matrix.target }}
-          path: |
-            ${{ env.HOME }}/.cargo"
-            target
-
-      - name: Install cross toolchain (armv7)
-        if: ${{ matrix.target == 'armv7-unknown-linux-gnueabihf' }}
-        run: sudo apt install gcc-arm-linux-gnueabihf
-
-      - name: Enable cross compilation (armv7)
-        if: ${{ matrix.target == 'armv7-unknown-linux-gnueabihf' }}
-        run: |
-          echo "PKG_CONFIG_ALLOW_CROSS=1" >> $GITHUB_ENV
-          echo "LZMA_API_STATIC=1" >> $GITHUB_ENV
 
       - name: Build release
         uses: actions-rs/cargo@v1
