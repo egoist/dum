@@ -2,13 +2,21 @@
 
 ---
 
-<br><br><br><br>
+<br><br><br>
 
+<p align="center">
 <img src="https://mystickermania.com/cdn/stickers/games/among-us-lime-character-dum.svg" width="200">
+<br><br>
+<strong>dum<strong> replaces <code>npm run</code>. <br>Instead of waiting 200ms for your npm client to start, it will start immediately.
+</p>
 
-<br><br><br><br>
+<br><br>
 
-> **dum** replaces `npm run`. Instead of waiting 200ms for your npm client to start, it will start immediately.
+<br>
+
+---
+
+<br>
 
 <img width="652" alt="CleanShot 2021-11-20 at 15 23 54@2x" src="https://user-images.githubusercontent.com/8784712/142718353-6e6f8327-c27e-404a-866e-6d5af3567cbc.png">
 
