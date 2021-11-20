@@ -40,6 +40,8 @@ dum some-npm-script --flags will --be forwareded
 
 # Run `npm i` or `yarn` or `pnpm i` depending on the project
 dum install # or `dum i`
+# Like above but add packages
+dum add react vue -D
 
 # More
 dum --help

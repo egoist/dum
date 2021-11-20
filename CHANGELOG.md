@@ -1,3 +1,7 @@
+## v0.1.7
+
+- Add command `add`
+
 ## v0.1.6
 
 - Forward args to `install` command.

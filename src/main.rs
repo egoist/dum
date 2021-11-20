@@ -47,7 +47,7 @@ fn main() {
     let remaining = args_to_string(&args.remaining);
 
     // Run npm install if the script_name is "install"
-    if args.script_name == "install" {
+    if args.script_name == "install" || args.script_name == "add" {
         let pm = install::guess_package_manager(&execute_dir);
 
         if pm.is_none() {
@@ -56,7 +56,7 @@ fn main() {
         }
 
         run_command(
-            &[&pm.unwrap(), "install", &remaining],
+            &[&pm.unwrap(), &args.script_name, &remaining],
             &RunOptions {
                 current_dir: execute_dir,
                 envs: HashMap::new(),
@@ -156,6 +156,12 @@ dum v{}
 
 USAGE:
     dum [OUR_FLAGS] [SCRIPT_NAME] [SCRIPT_ARGS]
+
+COMMANDS:
+    add <packages>  Add packages to the current project
+    i, install      Install dependencies
+    t, test         Run test script in nearest package.json
+    [script]        Run scripts in nearest package.json
 
 FLAGS:
     -h, --help            Prints help information
