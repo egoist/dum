@@ -44,6 +44,8 @@ fn main() {
         return;
     }
 
+    let remaining = args_to_string(&args.remaining);
+
     // Run npm install if the script_name is "install"
     if args.script_name == "install" {
         let pm = install::guess_package_manager(&execute_dir);
@@ -54,7 +56,7 @@ fn main() {
         }
 
         run_command(
-            &[&pm.unwrap(), "install"],
+            &[&pm.unwrap(), "install", &remaining],
             &RunOptions {
                 current_dir: execute_dir,
                 envs: HashMap::new(),
@@ -71,7 +73,7 @@ fn main() {
         .and_then(|script| script.as_str())
         .map(|script| {
             println!("> {}", script);
-            let remaining = args_to_string(&args.remaining);
+
             let envs =
                 HashMap::from([("PATH".to_string(), get_path_env(&bin_dir.to_str().unwrap()))]);
 

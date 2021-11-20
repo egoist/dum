@@ -1,3 +1,7 @@
+## v0.1.6
+
+- Forward args to `install` command.
+
 ## v0.1.5
 
 - Alias script `t` to `test`, so `dum t` and `dum test` are equivalent.
