@@ -1,13 +1,11 @@
-**💛 You can help the author become a full-time open-source maintainer by [sponsoring him on GitHub](https://github.com/sponsors/egoist).**
-
----
-
 <br><br><br>
 
 <p align="center">
 <img src="https://mystickermania.com/cdn/stickers/games/among-us-lime-character-dum.svg" width="200">
 <br><br>
 <strong>dum<strong> replaces <code>npm run</code>. <br>Instead of waiting 200ms for your npm client to start, it will start immediately.
+<br>
+<strong>💛 You can help the author become a full-time open-source maintainer by <a href="https://github.com/sponsors/egois">sponsoring him on GitHub</a>.</strong>
 </p>
 
 <br><br>
