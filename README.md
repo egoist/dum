@@ -31,6 +31,17 @@ Or [download a release](https://github.com/egoist/dum/releases) and move it to `
 
 PR welcome for adding a shell script so you can install `dum` with a single `curl` command.
 
+## Usage
+
+```bash
+dum some-npm-script
+
+dum some-npm-script --flags will --be forwareded
+
+## More
+dum --help
+```
+
 ## TODO
 
 - Support [package.json vars](https://docs.npmjs.com/cli/v8/using-npm/scripts#packagejson-vars)
