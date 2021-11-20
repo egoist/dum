@@ -85,7 +85,7 @@ jobs:
           SDKROOT: /Library/Developer/CommandLineTools/SDKs/MacOSX11.1.sdk
         with:
           command: build
-          args: --target ${{ matrix.target }} --release --locked --features tls-vendored
+          args: --target ${{ matrix.target }} --release
 
       - name: Copy and rename utility
         run: cp target/${{ matrix.target }}/release/${{ matrix.output }} ${{ matrix.output }}
