@@ -8,15 +8,16 @@
 <strong>💛 You can help the author become a full-time open-source maintainer by <a href="https://github.com/sponsors/egois">sponsoring him on GitHub</a>.</strong>
 </p>
 
-<br><br>
+<br>
+
+<p align="center">
+<img width="500" alt="CleanShot 2021-11-20 at 15 23 54@2x" src="https://user-images.githubusercontent.com/8784712/142718353-6e6f8327-c27e-404a-866e-6d5af3567cbc.png"></p>
 
 <br>
 
 ---
 
 <br>
-
-<img width="652" alt="CleanShot 2021-11-20 at 15 23 54@2x" src="https://user-images.githubusercontent.com/8784712/142718353-6e6f8327-c27e-404a-866e-6d5af3567cbc.png">
 
 ## Install
 
