@@ -118,15 +118,13 @@ fn parse_args() -> Result<AppArgs, pico_args::Error> {
         }
     }
 
-    // Alias t to test
-    if script_name == "t" {
-        script_name = "test".to_string();
-    }
-
-    // Alias i to install
-    if script_name == "i" {
-        script_name = "install".to_string();
-    }
+    script_name = match script_name.as_ref() {
+        // Alias t to test
+        "t" => "test".to_string(),
+        // Alias i to install
+        "i" => "install".to_string(),
+        _ => script_name,
+    };
 
     let args = AppArgs {
         script_name,
