@@ -81,10 +81,11 @@ USAGE:
     dum [OUR_FLAGS] [SCRIPT_NAME] [SCRIPT_ARGS]
 
 COMMANDS:
-    add <packages>  Add packages to the current project
-    i, install      Install dependencies
-    t, test         Run test script in nearest package.json
-    [script]        Run scripts in nearest package.json
+    add <packages>     Add packages to the current project
+    i, install         Install dependencies
+    remove <packages>  Remove packages from the current project
+    t, test            Run test script in nearest package.json
+    [script]           Run scripts in nearest package.json
 
 FLAGS:
     -h, --help            Prints help information
