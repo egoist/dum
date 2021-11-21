@@ -53,7 +53,7 @@ dum --help
 
 ## Inspiration
 
-Inspired by [bun](https://bun.sh/).
+I want to try and learn Rust so I made this. Inspired by [bun](https://bun.sh/). 
 
 ## Sponsors
 
