@@ -167,7 +167,7 @@ pub fn dum(args: &AppArgs) {
     let remaining = args_to_string(&args.remaining);
 
     // Run npm install if the script_name is "install"
-    if args.script_name == "install" || args.script_name == "add" {
+    if ["install", "add", "remove"].contains(&args.script_name.as_str()) {
         let pm = install::guess_package_manager(&execute_dir);
 
         if pm.is_none() {
