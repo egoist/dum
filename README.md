@@ -19,6 +19,10 @@
 
 <br>
 
+## How
+
+This is written in Rust! (Or any compile-to-native language).
+
 ## Install
 
 If you are a Rust user:
