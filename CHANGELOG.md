@@ -1,3 +1,8 @@
+## v0.1.9
+
+- Add `remove` command, mirrors `npm remove` `yarn remove` and `pnpm remove`.
+- Add `-c <dir>` flag to change working directory.
+
 ## v0.1.8
 
 ### Fixes
