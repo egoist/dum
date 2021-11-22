@@ -10,6 +10,5 @@ homepage = "https://github.com/egoist/dum"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-pico-args = "0.4.2"
 serde_json = "1.0"
 dialoguer = "0.9.0"

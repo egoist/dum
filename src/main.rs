@@ -1,13 +1,9 @@
 use dum::{dum, parse_args};
+use std::env;
 
 fn main() {
-    let args = match parse_args() {
-        Ok(v) => v,
-        Err(e) => {
-            eprintln!("Error: {}.", e);
-            std::process::exit(1);
-        }
-    };
+    let args_vec: Vec<String> = env::args().collect();
+    let args = parse_args(&args_vec[1..]);
 
     dum(&args);
 }

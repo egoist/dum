@@ -43,6 +43,9 @@ dum install # or `dum i`
 # Like above but add packages
 dum add react vue -D
 
+# Change working directory
+dum -c packages/sub-package build
+
 # More
 dum --help
 ```
@@ -53,7 +56,7 @@ dum --help
 
 ## Inspiration
 
-I want to try and learn Rust so I made this. Inspired by [bun](https://bun.sh/). 
+I want to try and learn Rust so I made this. Inspired by [bun](https://bun.sh/).
 
 ## Sponsors
 
