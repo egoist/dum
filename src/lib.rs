@@ -81,10 +81,11 @@ USAGE:
     dum [OUR_FLAGS] [SCRIPT_NAME] [SCRIPT_ARGS]
 
 COMMANDS:
-    add <packages>  Add packages to the current project
-    i, install      Install dependencies
-    t, test         Run test script in nearest package.json
-    [script]        Run scripts in nearest package.json
+    add <packages>     Add packages to the current project
+    i, install         Install dependencies
+    remove <packages>  Remove packages from the current project
+    t, test            Run test script in nearest package.json
+    [script]           Run scripts in nearest package.json
 
 FLAGS:
     -h, --help            Prints help information
@@ -167,7 +168,7 @@ pub fn dum(args: &AppArgs) {
     let remaining = args_to_string(&args.remaining);
 
     // Run npm install if the script_name is "install"
-    if args.script_name == "install" || args.script_name == "add" {
+    if ["install", "add", "remove"].contains(&args.script_name.as_str()) {
         let pm = install::guess_package_manager(&execute_dir);
 
         if pm.is_none() {
