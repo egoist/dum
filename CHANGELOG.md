@@ -1,3 +1,7 @@
+## Unreleased
+
+- Fallback to run binaries in `node_modules/.bin/` when specified script doesn't exist in `package.json`.
+
 ## v0.1.9
 
 - Add `remove` command, mirrors `npm remove` `yarn remove` and `pnpm remove`.

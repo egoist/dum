@@ -109,20 +109,30 @@ pub fn dum(args: &args::AppArgs) {
         return;
     }
 
-    println!("> {}", args.script_name);
-
     let result = v
         .get("scripts")
-        .and_then(|scripts| scripts.get(&args.script_name))
-        .and_then(|script| script.as_str())
+        .and_then(|scripts| match scripts.get(&args.script_name) {
+            Some(script) => {
+                println!("> {}", args.script_name);
+                println!("> {}", script.as_str().unwrap());
+                script.as_str().map(|script| script.to_string())
+            }
+            None => {
+                let bin_file = bin_dir.join(&args.script_name);
+                if bin_file.exists() {
+                    println!("> {}", bin_file.display());
+                    Some(bin_file.to_string_lossy().to_string())
+                } else {
+                    None
+                }
+            }
+        })
         .map(|script| {
-            println!("> {}", script);
-
             let envs =
                 HashMap::from([("PATH".to_string(), get_path_env(&bin_dir.to_str().unwrap()))]);
 
             run_command(
-                &[script, &args.forwared],
+                &[&script, &args.forwared],
                 &RunOptions {
                     current_dir: execute_dir,
                     envs,
