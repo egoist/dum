@@ -43,6 +43,10 @@ pub fn parse_args(args_vec: &[String]) -> AppArgs {
                                 print!("{}", get_help());
                                 std::process::exit(0);
                             }
+                            "-v" | "--version" => {
+                                println!("{}", get_version());
+                                std::process::exit(0);
+                            }
                             _ => {
                                 println!("Unknown flag: {}", v);
                                 exit(1);
@@ -71,6 +75,10 @@ pub fn parse_args(args_vec: &[String]) -> AppArgs {
     args
 }
 
+fn get_version() -> String {
+    env!("CARGO_PKG_VERSION").to_string()
+}
+
 fn get_help() -> String {
     format!(
         "\
@@ -90,7 +98,7 @@ FLAGS:
     -c <dir>              Change working directory
     -h, --help            Prints help information
 ",
-        env!("CARGO_PKG_VERSION")
+        get_version()
     )
 }
 
