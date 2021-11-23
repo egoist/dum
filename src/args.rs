@@ -97,6 +97,7 @@ COMMANDS:
 FLAGS:
     -c <dir>              Change working directory
     -h, --help            Prints help information
+    -v, --version         Prints version number
 ",
         get_version()
     )
