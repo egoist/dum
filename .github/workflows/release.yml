@@ -92,13 +92,18 @@ jobs:
           zip dum-${{ matrix.target }}.${{ matrix.archive }} ${{ matrix.output }}
           sha256sum dum-${{ matrix.target }}.${{ matrix.archive }} > dum-${{ matrix.target }}-sha256sum.txt
 
-      - name: Upload artifacts
+      - name: Upload artifacts archive
         uses: actions/upload-artifact@v1
         with:
           name: dum-${{ matrix.target }}.${{ matrix.archive }}
           path: |
             dum-${{ matrix.target }}.${{ matrix.archive }}
-            dum-${{ matrix.target }}-sha256sum.txt
+
+      - name: Upload artifacts checksum
+        uses: actions/upload-artifact@v1
+        with:
+          name: dum-${{ matrix.target }}-sha256sum.txt
+          path: dum-${{ matrix.target }}-sha256sum.txt
 
       - name: Upload binary to release
         if: ${{ startsWith(github.ref, 'refs/tags/v') }}
