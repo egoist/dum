@@ -33,6 +33,18 @@ cargo install dum
 
 Or [download a release](https://github.com/egoist/dum/releases) and move it to `/usr/local/bin` manually.
 
+### Homebrew
+
+```bash
+brew install bytesfriends/fun/dum
+```
+
+Or
+
+```bash
+brew tap bytesfriends/fun && brew install dum
+```
+
 PR welcome for adding a shell script so you can install `dum` with a single `curl` command.
 
 ## Usage
