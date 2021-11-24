@@ -76,21 +76,29 @@ jobs:
 
       - name: Create archive (tgz, linux)
         if: ${{ matrix.os != 'macos-latest' && matrix.os != 'windows-latest' }}
-        run: tar -czvf dum-${{ matrix.target }}.tgz ${{ matrix.output }}
+        run: |
+          tar -czvf dum-${{ matrix.target }}.${{ matrix.archive }} ${{ matrix.output }}
+          sha256sum dum-${{ matrix.target }}.${{ matrix.archive }} > dum-${{ matrix.target }}-sha256sum.txt
 
       - name: Create archive (zip, windows)
         if: ${{ matrix.os == 'windows-latest' }}
-        run: tar.exe -a -c -f dum-${{ matrix.target }}.zip ${{ matrix.output }}
+        run: |
+          tar.exe -a -c -f dum-${{ matrix.target }}.${{ matrix.archive }} ${{ matrix.output }}
+          sha256sum.exe dum-${{ matrix.target }}.${{ matrix.archive }} > dum-${{ matrix.target }}-sha256sum.txt
 
       - name: Create archive (zip, macos)
         if: ${{ matrix.os == 'macos-latest' }}
-        run: zip dum-${{ matrix.target }}.zip ${{ matrix.output }}
+        run: |
+          zip dum-${{ matrix.target }}.${{ matrix.archive }} ${{ matrix.output }}
+          sha256sum dum-${{ matrix.target }}.${{ matrix.archive }} > dum-${{ matrix.target }}-sha256sum.txt
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v1
         with:
           name: dum-${{ matrix.target }}.${{ matrix.archive }}
-          path: dum-${{ matrix.target }}.${{ matrix.archive }}
+          path: |
+            dum-${{ matrix.target }}.${{ matrix.archive }}
+            dum-${{ matrix.target }}-sha256sum.txt
 
       - name: Upload binary to release
         if: ${{ startsWith(github.ref, 'refs/tags/v') }}
@@ -99,5 +107,15 @@ jobs:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: dum-${{ matrix.target }}.${{ matrix.archive }}
           asset_name: dum-${{ matrix.target }}.${{ matrix.archive }}
+          tag: ${{ github.ref }}
+          overwrite: true
+
+      - name: Upload checksum to release
+        if: ${{ startsWith(github.ref, 'refs/tags/v') }}
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: dum-${{ matrix.target }}-sha256.txt
+          asset_name: dum-${{ matrix.target }}-sha256.txt
           tag: ${{ github.ref }}
           overwrite: true

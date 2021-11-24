@@ -1,6 +1,7 @@
-## Unreleased
+## v0.1.10
 
 - Fallback to run binaries in `node_modules/.bin/` when specified script doesn't exist in `package.json`.
+- Available via Homebrew `brew install egoist/tap/dum`
 
 ## v0.1.9
 
