@@ -25,6 +25,12 @@ This is written in Rust! (Or any compile-to-native language).
 
 ## Install
 
+If you are a Mac user, install it with Homebrew:
+
+```bash
+brew install egoist/tap/dum
+```
+
 If you are a Rust user:
 
 ```bash
