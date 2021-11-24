@@ -5,7 +5,7 @@
 <br><br>
 <strong>dum</strong> replaces <code>npm run</code>. <br>Instead of waiting 200ms for your npm client to start, it will start immediately.
 <br>
-<strong>💛 You can help the author become a full-time open-source maintainer by <a href="https://github.com/sponsors/egois">sponsoring him on GitHub</a>.</strong>
+<strong>💛 You can help the author become a full-time open-source maintainer by <a href="https://github.com/sponsors/egoist">sponsoring him on GitHub</a>.</strong>
 </p>
 
 <br>
