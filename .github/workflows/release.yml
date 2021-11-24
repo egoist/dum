@@ -96,8 +96,7 @@ jobs:
         uses: actions/upload-artifact@v1
         with:
           name: dum-${{ matrix.target }}.${{ matrix.archive }}
-          path: |
-            dum-${{ matrix.target }}.${{ matrix.archive }}
+          path: dum-${{ matrix.target }}.${{ matrix.archive }}
 
       - name: Upload artifacts checksum
         uses: actions/upload-artifact@v1
