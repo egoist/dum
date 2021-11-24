@@ -119,7 +119,7 @@ jobs:
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: dum-${{ matrix.target }}-sha256.txt
-          asset_name: dum-${{ matrix.target }}-sha256.txt
+          file: dum-${{ matrix.target }}-sha256sum.txt
+          asset_name: dum-${{ matrix.target }}-sha256sum.txt
           tag: ${{ github.ref }}
           overwrite: true
