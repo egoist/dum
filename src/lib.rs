@@ -114,7 +114,7 @@ pub fn dum(args: &args::AppArgs) {
         .and_then(|scripts| match scripts.get(&args.script_name) {
             Some(script) => {
                 println!("> {}", args.script_name);
-                println!("> {}", script.as_str().unwrap());
+                println!("> {}{}", script.as_str().unwrap(), args.forwared);
                 script.as_str().map(|script| script.to_string())
             }
             None => {
