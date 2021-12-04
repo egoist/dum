@@ -21,7 +21,7 @@ fn get_path_env(bin_dir: &str) -> String {
 
 // A function to find the closest file
 // Starting from current directory
-// Recusively until it finds the file or reach root directory
+// Recusively until it finds the file or reach root directory `/` or `C:\\`
 fn find_closest_file(_current_dir: &PathBuf, name: &str) -> Option<PathBuf> {
     let mut closest_file = None;
     let mut current_dir = _current_dir.clone();
