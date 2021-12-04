@@ -13,12 +13,16 @@ use std::process::{exit, Command};
 
 // Get PATH env and join it with bin_dir
 fn get_path_env(bin_dirs: Vec<PathBuf>) -> String {
-    let mut path = env::var("PATH").unwrap_or_default();
-    for dir in bin_dirs {
-        path.push_str(":");
-        path.push_str(dir.to_str().unwrap());
-    }
-    path
+    let path = PathBuf::from(env::var("PATH").unwrap_or_default());
+    env::join_paths(
+        bin_dirs
+            .iter()
+            .chain(env::split_paths(&path).collect::<Vec<PathBuf>>().iter()),
+    )
+    .ok()
+    .unwrap()
+    .into_string()
+    .unwrap()
 }
 
 // A function to find the closest file
