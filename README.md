@@ -3,7 +3,7 @@
 <p align="center">
 <img src="https://mystickermania.com/cdn/stickers/games/among-us-lime-character-dum.svg" width="200">
 <br><br>
-<strong>dum</strong> replaces <code>npm run</code>. <br>Instead of waiting 200ms for your npm client to start, it will start immediately.
+<strong>dum</strong> replaces <code>npm run</code> and <code>npx</code>. <br>Instead of waiting 200ms for your npm client to start, it will start immediately.
 <br>
 <strong>💛 You can help the author become a full-time open-source maintainer by <a href="https://github.com/sponsors/egoist">sponsoring him on GitHub</a>.</strong>
 </p>
@@ -46,7 +46,9 @@ PR welcome for adding a shell script so you can install `dum` with a single `cur
 ```bash
 dum some-npm-script
 
-dum some-npm-script --flags will --be forwareded
+dum some-npm-script --flags will --be forwarded
+# Like npx, but mush faster
+dum some-npm-package-cli-name --flags will --be forwarded
 
 # Run `npm i` or `yarn` or `pnpm i` depending on the project
 dum install # or `dum i`
