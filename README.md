@@ -25,21 +25,27 @@ This is written in Rust! (Or any compile-to-native language).
 
 ## Install
 
-If you are a Mac user, install it with Homebrew:
+### Homebrew
 
 ```bash
 brew install egoist/tap/dum
 ```
 
-If you are a Rust user:
+### Shell
+
+```bash
+curl -sSL https://bina.egoist.sh/egoist/dum | sh
+```
+
+### Cargo
 
 ```bash
 cargo install dum
 ```
 
-Or [download a release](https://github.com/egoist/dum/releases) and move it to `/usr/local/bin` manually.
+### GitHub Releases
 
-PR welcome for adding a shell script so you can install `dum` with a single `curl` command.
+[Download a release manually](https://github.com/egoist/dum/releases) and move it to `/usr/local/bin` manually.
 
 ## Usage
 
