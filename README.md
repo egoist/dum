@@ -43,7 +43,7 @@ PR welcome for adding a shell script so you can install `dum` with a single `cur
 
 ## Usage
 
-`dum <npm_script|bin_script> [...args_to_forward]`: Run npm scripts or scripts in `node_modules/.bin`, like `yarn run`, `npm run`, `npx.
+`dum <npm_script|bin_script> [...args_to_forward]`: Run npm scripts or scripts in `node_modules/.bin`, like `yarn run`, `npm run`, `npx`.
 
 If you want to pass flags to `dum` itself, like the `-c` flag to change directory, you should put it before the script name, like `dum -c another/directory script_name --forward some_flag`.
 
