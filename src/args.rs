@@ -7,6 +7,7 @@ pub struct AppArgs {
     pub script_name: String,
     pub forwared: String,
     pub change_dir: PathBuf,
+    pub command: String,
 }
 
 pub fn parse_args(args_vec: &[String]) -> AppArgs {
@@ -16,6 +17,7 @@ pub fn parse_args(args_vec: &[String]) -> AppArgs {
         script_name: "".to_string(),
         change_dir: PathBuf::from(env::current_dir().as_ref().unwrap()),
         forwared: "".to_string(),
+        command: "".to_string(),
     };
 
     loop {
@@ -57,6 +59,8 @@ pub fn parse_args(args_vec: &[String]) -> AppArgs {
                         args.forwared.push_str(" ");
                         args.forwared.push_str(&v);
                     }
+                } else if v == "run" {
+                    args.command = v.to_string();
                 } else if args.script_name.is_empty() {
                     args.script_name = match v.as_ref() {
                         "t" => "test".to_string(),
@@ -79,7 +83,7 @@ fn get_version() -> String {
     env!("CARGO_PKG_VERSION").to_string()
 }
 
-fn get_help() -> String {
+pub fn get_help() -> String {
     format!(
         "\
 dum v{}
@@ -88,6 +92,8 @@ USAGE:
     dum [OUR_FLAGS] [SCRIPT_NAME] [SCRIPT_ARGS]
 
 COMMANDS:
+    run                Show a list of available scripts
+    run <script_name>  Run a script
     add <packages>     Add packages to the current project
     i, install         Install dependencies
     remove <packages>  Remove packages from the current project

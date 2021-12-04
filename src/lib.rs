@@ -12,26 +12,30 @@ use std::path::PathBuf;
 use std::process::{exit, Command};
 
 // Get PATH env and join it with bin_dir
-fn get_path_env(bin_dir: &str) -> String {
+fn get_path_env(bin_dirs: Vec<PathBuf>) -> String {
     let mut path = env::var("PATH").unwrap_or_default();
-    path.push_str(":");
-    path.push_str(bin_dir);
+    for dir in bin_dirs {
+        path.push_str(":");
+        path.push_str(dir.to_str().unwrap());
+    }
     path
 }
 
 // A function to find the closest file
 // Starting from current directory
 // Recusively until it finds the file or reach root directory `/`
-fn find_closest_file(_current_dir: &PathBuf, name: &str) -> Option<PathBuf> {
-    let mut closest_file = None;
+fn find_closest_files(_current_dir: &PathBuf, name: &str, stop_on_first: bool) -> Vec<PathBuf> {
+    let mut closest_file: Vec<PathBuf> = Vec::new();
     let stop_dir = "/".to_string();
     let mut current_dir = _current_dir.clone();
 
     loop {
         let path = current_dir.join(name);
         if path.exists() {
-            closest_file = Some(PathBuf::from(path.to_str().unwrap()));
-            break;
+            closest_file.push(path);
+            if stop_on_first {
+                break;
+            }
         }
 
         if current_dir.to_str().unwrap() == stop_dir {
@@ -67,17 +71,39 @@ fn run_command(args: &[&str], options: &RunOptions) {
     exit(status.code().unwrap_or(1));
 }
 
-pub fn dum(args: &args::AppArgs) {
-    let pkg_path = find_closest_file(&args.change_dir, "package.json").expect("no package.json");
+fn resolve_bin_path(bin_name: &str, dirs: &Vec<PathBuf>) -> Option<PathBuf> {
+    for dir in dirs {
+        let path = dir.join(bin_name);
+        if path.exists() {
+            return Some(path);
+        }
+    }
+
+    None
+}
+
+pub fn dum(app_args: &args::AppArgs) {
+    let pkg_paths = find_closest_files(&app_args.change_dir, "package.json", true);
+    let pkg_path = if pkg_paths.is_empty() {
+        println!("No package.json found");
+        exit(1);
+    } else {
+        pkg_paths[0].clone()
+    };
+
     // The current_dir to execute npm scripts
     let execute_dir = PathBuf::from(pkg_path.parent().unwrap());
-    // bin_dir is the dirname of pkg_data followed by node_modules/.bin
-    let bin_dir = PathBuf::from(execute_dir.join("node_modules").join(".bin"));
+
+    let node_modules_dirs = find_closest_files(&app_args.change_dir, "node_modules", false);
+    let bin_dirs = node_modules_dirs
+        .iter()
+        .map(|dir| dir.join(".bin"))
+        .collect::<Vec<PathBuf>>();
 
     let contents = read_to_string(pkg_path).expect("failed to read package.json");
     let v: Value = serde_json::from_str(&contents).expect("failed to parse package.json");
 
-    if args.script_name.is_empty() {
+    if app_args.command == "run" && app_args.script_name.is_empty() {
         if let Some(scripts) = v["scripts"].as_object() {
             println!("\nAvailable scripts:\n");
             for (name, value) in scripts {
@@ -90,8 +116,14 @@ pub fn dum(args: &args::AppArgs) {
         return;
     }
 
+    if app_args.script_name.is_empty() {
+        println!("No script name specified.\n");
+        println!("{}", args::get_help());
+        return;
+    }
+
     // Run npm install if the script_name is "install"
-    if ["install", "add", "remove"].contains(&args.script_name.as_str()) {
+    if ["install", "add", "remove"].contains(&app_args.script_name.as_str()) {
         let pm = install::guess_package_manager(&execute_dir);
 
         if pm.is_none() {
@@ -100,7 +132,7 @@ pub fn dum(args: &args::AppArgs) {
         }
 
         run_command(
-            &[&pm.unwrap(), &args.script_name, &args.forwared],
+            &[&pm.unwrap(), &app_args.script_name, &app_args.forwared],
             &RunOptions {
                 current_dir: execute_dir,
                 envs: HashMap::new(),
@@ -109,39 +141,49 @@ pub fn dum(args: &args::AppArgs) {
         return;
     }
 
-    let result = v
-        .get("scripts")
-        .and_then(|scripts| match scripts.get(&args.script_name) {
-            Some(script) => {
-                println!("> {}", args.script_name);
-                println!("> {}{}", script.as_str().unwrap(), args.forwared);
-                script.as_str().map(|script| script.to_string())
-            }
-            None => {
-                let bin_file = bin_dir.join(&args.script_name);
-                if bin_file.exists() {
-                    println!("> {}", bin_file.display());
-                    Some(bin_file.to_string_lossy().to_string())
-                } else {
-                    None
-                }
-            }
+    let npm_script = v.get("scripts").and_then(|scripts| {
+        scripts.as_object().and_then(|scripts| {
+            scripts
+                .get(app_args.script_name.as_str())
+                .and_then(|script| {
+                    let script = script.as_str().map(|script| script.to_string());
+                    Some(script.unwrap_or_default())
+                })
         })
-        .map(|script| {
-            let envs =
-                HashMap::from([("PATH".to_string(), get_path_env(&bin_dir.to_str().unwrap()))]);
+    });
 
-            run_command(
-                &[&script, &args.forwared],
-                &RunOptions {
-                    current_dir: execute_dir,
-                    envs,
-                },
-            );
-        });
-
-    if result.is_none() {
-        eprintln!("Error: script not found.");
-        std::process::exit(1);
+    if npm_script.is_some() {
+        let script = npm_script.unwrap();
+        println!("> {}", app_args.script_name);
+        println!("> {}{}", script, app_args.forwared);
+        let envs = HashMap::from([("PATH".to_string(), get_path_env(bin_dirs))]);
+        run_command(
+            &[&script, &app_args.forwared],
+            &RunOptions {
+                current_dir: execute_dir,
+                envs,
+            },
+        );
+        return;
     }
+
+    let resolved_bin = resolve_bin_path(app_args.script_name.as_str(), &bin_dirs);
+    if resolved_bin.is_some() {
+        let bin_path = resolved_bin.unwrap();
+        println!("> {}", app_args.script_name);
+        println!("> {}{}", bin_path.to_str().unwrap(), app_args.forwared);
+        let envs = HashMap::from([("PATH".to_string(), get_path_env(bin_dirs))]);
+        run_command(
+            &[bin_path.to_str().unwrap(), &app_args.forwared],
+            &RunOptions {
+                current_dir: execute_dir,
+                envs,
+            },
+        );
+        return;
+    }
+
+    println!("No script found.");
+    println!("To see a list of scripts, run `dum run`");
+    exit(1);
 }
