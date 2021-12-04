@@ -88,6 +88,7 @@ jobs:
         with:
           command: build
           args: --target ${{ matrix.target }} --release
+          use-cross: ${{ matrix.os == 'ubuntu-latest' }}
 
       - name: Copy and rename utility
         run: cp target/${{ matrix.target }}/release/${{ matrix.output }} ${{ matrix.output }}
