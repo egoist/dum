@@ -3,6 +3,8 @@ name: Rust
 on:
   push:
     tags: ["v*"]
+  pull_request:
+    branches: ["main"]
 
 env:
   CARGO_TERM_COLOR: always
@@ -16,10 +18,18 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - target: x86_64-unknown-linux-gnu
+          - target: x86_64-unknown-linux-musl
             os: ubuntu-latest
             output: dum
-            archive: tgz
+            archive: tar.gz
+          - target: arm-unknown-linux-musleabihf
+            os: ubuntu-latest
+            output: dum
+            archive: tar.gz
+          - target: aarch64-unknown-linux-musl
+            os: ubuntu-latest
+            output: dum
+            archive: tar.gz
           - target: x86_64-apple-darwin
             os: macos-latest
             output: dum
@@ -34,6 +44,10 @@ jobs:
           #   output: dum
           #   archive: tgz
           - target: x86_64-pc-windows-msvc
+            os: windows-latest
+            output: dum.exe
+            archive: zip
+          - target: aarch64-pc-windows-msvc
             os: windows-latest
             output: dum.exe
             archive: zip
@@ -74,35 +88,38 @@ jobs:
         with:
           command: build
           args: --target ${{ matrix.target }} --release
+          use-cross: ${{ matrix.os == 'ubuntu-latest' }}
 
       - name: Copy and rename utility
         run: cp target/${{ matrix.target }}/release/${{ matrix.output }} ${{ matrix.output }}
 
-      - name: Create archive (tgz, linux)
+      - name: Create archive (linux)
         if: ${{ matrix.os != 'macos-latest' && matrix.os != 'windows-latest' }}
         run: |
           tar -czvf dum-${{ matrix.target }}.${{ matrix.archive }} ${{ matrix.output }}
           sha256sum dum-${{ matrix.target }}.${{ matrix.archive }} > dum-${{ matrix.target }}-sha256sum.txt
 
-      - name: Create archive (zip, windows)
+      - name: Create archive (windows)
         if: ${{ matrix.os == 'windows-latest' }}
         run: |
           tar.exe -a -c -f dum-${{ matrix.target }}.${{ matrix.archive }} ${{ matrix.output }}
           sha256sum.exe dum-${{ matrix.target }}.${{ matrix.archive }} > dum-${{ matrix.target }}-sha256sum.txt
 
-      - name: Create archive (zip, macos)
+      - name: Create archive (macos)
         if: ${{ matrix.os == 'macos-latest' }}
         run: |
           zip dum-${{ matrix.target }}.${{ matrix.archive }} ${{ matrix.output }}
           sha256sum dum-${{ matrix.target }}.${{ matrix.archive }} > dum-${{ matrix.target }}-sha256sum.txt
 
       - name: Upload artifacts archive
+        if: ${{ startsWith(github.ref, 'refs/tags/v') }}
         uses: actions/upload-artifact@v1
         with:
           name: dum-${{ matrix.target }}.${{ matrix.archive }}
           path: dum-${{ matrix.target }}.${{ matrix.archive }}
 
       - name: Upload artifacts checksum
+        if: ${{ startsWith(github.ref, 'refs/tags/v') }}
         uses: actions/upload-artifact@v1
         with:
           name: dum-${{ matrix.target }}-sha256sum.txt
