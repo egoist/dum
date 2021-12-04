@@ -43,6 +43,12 @@ PR welcome for adding a shell script so you can install `dum` with a single `cur
 
 ## Usage
 
+`dum <npm_script|bin_script> [...args_to_forward]`: Run npm scripts or scripts in `node_modules/.bin`, like `yarn run`, `npm run`, `npx.
+
+If you want to pass flags to `dum` itself, like the `-c` flag to change directory, you should put it before the script name, like `dum -c another/directory script_name --forward some_flag`.
+
+Examples:
+
 ```bash
 dum some-npm-script
 
@@ -50,16 +56,24 @@ dum some-npm-script --flags will --be forwarded
 # Like npx, but mush faster
 dum some-npm-package-cli-name --flags will --be forwarded
 
-# Run `npm i` or `yarn` or `pnpm i` depending on the project
-dum install # or `dum i`
-# Like above but add packages
-dum add react vue -D
-
 # Change working directory
 dum -c packages/sub-package build
 
 # More
 dum --help
+```
+
+### Install Packages
+
+Dum is not a package manager yet, but we forward `install`, `add`, `remove` commands to npm, pnpm and yarn automatically:
+
+```bash
+# Run `npm i` or `yarn` or `pnpm i` depending on the project
+dum install # or `dum i`
+# Like above but add packages
+dum add react vue -D
+
+dum remove react vue
 ```
 
 ## Limitations

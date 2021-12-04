@@ -92,8 +92,9 @@ USAGE:
     dum [OUR_FLAGS] [SCRIPT_NAME] [SCRIPT_ARGS]
 
 COMMANDS:
+    <script_name>      Run an npm script (like npm run) or a script in node_modules/.bin (like npx)
     run                Show a list of available scripts
-    run <script_name>  Run a script
+    run <script_name>  Run an npm script
     add <packages>     Add packages to the current project
     i, install         Install dependencies
     remove <packages>  Remove packages from the current project

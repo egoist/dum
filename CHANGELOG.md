@@ -1,3 +1,7 @@
+## v0.1.11
+
+- Resolve `node_modules/.bin` in parent directories too
+
 ## v0.1.10
 
 - Fallback to run binaries in `node_modules/.bin/` when specified script doesn't exist in `package.json`.
