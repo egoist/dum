@@ -1,3 +1,7 @@
+## v0.1.12
+
+- Properly concat `$PATH` on Windows. [#24](https://github.com/egoist/dum/issues/24)
+
 ## v0.1.11
 
 - Resolve `node_modules/.bin` in parent directories too
