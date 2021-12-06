@@ -23,6 +23,13 @@
 
 This is written in Rust! (Or any compile-to-native language).
 
+Benchmark (`hyperfine "dum foo" "npm run foo" --warmup 10`):
+
+| Command       |   Mean [ms] | Min [ms] | Max [ms] |    Relative |
+| :------------ | ----------: | -------: | -------: | ----------: |
+| `dum foo`     |  41.7 ± 1.2 |     39.8 |     44.6 |        1.00 |
+| `npm run foo` | 333.7 ± 2.0 |    330.0 |    336.0 | 8.01 ± 0.23 |
+
 ## Install
 
 ### Homebrew
