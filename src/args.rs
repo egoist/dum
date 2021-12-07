@@ -1,6 +1,10 @@
+extern crate path_absolutize;
+
 use std::env;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use std::process::exit;
+
+use path_absolutize::Absolutize;
 
 #[derive(Debug)]
 pub struct AppArgs {
@@ -29,11 +33,13 @@ pub fn parse_args(args_vec: &[String]) -> AppArgs {
         match arg {
             Some(v) => {
                 if v.starts_with("-") {
-                    if args.script_name.is_empty() {
+                    if args.script_name.is_empty()
+                        && (args.command.is_empty() || args.command == "run")
+                    {
                         match v.as_ref() {
                             "-c" => {
                                 let dir = match args_iter.next() {
-                                    Some(v) => PathBuf::from(v),
+                                    Some(v) => PathBuf::from(Path::new(v).absolutize().unwrap()),
                                     None => {
                                         println!("No directory specified");
                                         exit(1);

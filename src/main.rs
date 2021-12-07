@@ -6,6 +6,7 @@ mod run;
 use std::env;
 
 fn main() {
+    env_logger::init();
     prompt::handle_ctrlc();
 
     let args_vec: Vec<String> = env::args().collect();

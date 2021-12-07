@@ -4,6 +4,7 @@ use ansi_term::{
     Color::{Purple, Red},
     Style,
 };
+use log::debug;
 use serde_json::Value;
 use std::collections::HashMap;
 use std::env;
@@ -31,9 +32,9 @@ fn get_path_env(bin_dirs: Vec<PathBuf>) -> String {
 fn find_closest_files(_current_dir: &PathBuf, name: &str, stop_on_first: bool) -> Vec<PathBuf> {
     let mut closest_file: Vec<PathBuf> = Vec::new();
     let mut current_dir = _current_dir.clone();
-
     loop {
         let path = current_dir.join(name);
+
         if path.exists() {
             closest_file.push(path);
             if stop_on_first {
@@ -86,6 +87,7 @@ fn resolve_bin_path(bin_name: &str, dirs: &Vec<PathBuf>) -> Option<PathBuf> {
 
 pub fn run(app_args: &args::AppArgs) {
     if args::COMMANDS_TO_FORWARD.contains(&app_args.command.as_str()) {
+        debug!("Running command {}", app_args.command);
         let pm = install::guess_package_manager(&app_args.change_dir);
 
         if pm.is_none() {
@@ -103,6 +105,7 @@ pub fn run(app_args: &args::AppArgs) {
         return;
     }
 
+    debug!("change dir to {}", app_args.change_dir.display());
     let pkg_paths = find_closest_files(&app_args.change_dir, "package.json", true);
     let pkg_path = if pkg_paths.is_empty() {
         eprintln!("No package.json found");
@@ -111,8 +114,10 @@ pub fn run(app_args: &args::AppArgs) {
         pkg_paths[0].clone()
     };
 
+    debug!("Found package.json at {}", pkg_path.display());
     // The current_dir to execute npm scripts
     let execute_dir = PathBuf::from(pkg_path.parent().unwrap());
+    debug!("execute_dir: {:?}", execute_dir);
 
     let node_modules_dirs = find_closest_files(&app_args.change_dir, "node_modules", false);
     let bin_dirs = node_modules_dirs
