@@ -1,3 +1,7 @@
+## v0.1.15
+
+- Forward args to `install` `uninstall` and `add` commands
+
 ## v0.1.14
 
 - Commands like `install` `uninstall` `add` are now handled before npm scripts, previously if there're no scripts or no package.json the command will not be executed.

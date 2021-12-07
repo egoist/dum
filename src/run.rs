@@ -94,7 +94,7 @@ pub fn run(app_args: &args::AppArgs) {
         }
 
         run_command(
-            &[&pm.unwrap(), &app_args.command, &app_args.forwared],
+            &[&pm.unwrap(), &app_args.command, &app_args.forwarded],
             &RunOptions {
                 current_dir: app_args.change_dir.clone(),
                 envs: HashMap::new(),
@@ -130,7 +130,7 @@ pub fn run(app_args: &args::AppArgs) {
     }
 
     let mut script_name = app_args.script_name.clone();
-    let mut forwarded = app_args.forwared.clone();
+    let mut forwarded = app_args.forwarded.clone();
 
     if !app_args.interactive && app_args.command == "run" && script_name.is_empty() {
         println!("\nAvailable scripts:\n");

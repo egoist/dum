@@ -5,7 +5,7 @@ use std::process::exit;
 #[derive(Debug)]
 pub struct AppArgs {
     pub script_name: String,
-    pub forwared: String,
+    pub forwarded: String,
     pub change_dir: PathBuf,
     pub command: String,
     pub interactive: bool,
@@ -19,7 +19,7 @@ pub fn parse_args(args_vec: &[String]) -> AppArgs {
     let mut args = AppArgs {
         script_name: "".to_string(),
         change_dir: PathBuf::from(env::current_dir().as_ref().unwrap()),
-        forwared: "".to_string(),
+        forwarded: "".to_string(),
         command: "".to_string(),
         interactive: false,
     };
@@ -62,16 +62,21 @@ pub fn parse_args(args_vec: &[String]) -> AppArgs {
                             }
                         }
                     } else {
-                        // forwared flags
-                        args.forwared.push_str(" ");
-                        args.forwared.push_str(&v);
+                        // forwarded flags
+                        args.forwarded.push_str(" ");
+                        args.forwarded.push_str(&v);
                     }
-                } else if COMMANDS_TO_FORWARD.contains(&v.as_str()) {
+                } else if args.command.is_empty()
+                    && (COMMANDS_TO_FORWARD.contains(&v.as_str()) || v == "run")
+                {
                     args.command = match v.as_ref() {
                         "i" => "install".to_string(),
                         _ => v.to_string(),
                     };
-                } else if args.script_name.is_empty() {
+                } else if (args.command.is_empty() || args.command == "run")
+                    && args.script_name.is_empty()
+                {
+                    args.command = "run".to_string();
                     args.script_name = match v.as_ref() {
                         "t" => "test".to_string(),
                         _ => v.to_string(),
@@ -81,8 +86,8 @@ pub fn parse_args(args_vec: &[String]) -> AppArgs {
                         eprintln!("You can't pass arguments to interactive mode");
                         exit(1);
                     }
-                    args.forwared.push_str(" ");
-                    args.forwared.push_str(&v);
+                    args.forwarded.push_str(" ");
+                    args.forwarded.push_str(&v);
                 }
             }
             None => break,
@@ -141,7 +146,7 @@ mod tests {
     fn test_parse() {
         let args = parse_args(&vec_of_strings!["a", "b", "-c", "-d", "foo", "bar"]);
         assert_eq!(args.script_name, "a".to_string());
-        assert_eq!(args.forwared, " b -c -d foo bar".to_string());
+        assert_eq!(args.forwarded, " b -c -d foo bar".to_string());
     }
 
     #[test]
@@ -149,6 +154,6 @@ mod tests {
         let args = parse_args(&vec_of_strings!["-c", ".", "a"]);
         assert_eq!(args.script_name, "a".to_string());
         assert_eq!(args.change_dir, PathBuf::from("."));
-        assert_eq!(args.forwared, "".to_string());
+        assert_eq!(args.forwarded, "".to_string());
     }
 }
