@@ -166,12 +166,13 @@ pub fn run(app_args: &args::AppArgs) {
         return;
     }
 
-    let npm_script = scripts.and_then(|scripts| {
-        scripts.get(script_name.as_str()).and_then(|script| {
+    let npm_script = scripts
+        .unwrap()
+        .get(script_name.as_str())
+        .and_then(|script| {
             let script = script.as_str().map(|script| script.to_string());
             Some(script.unwrap_or_default())
-        })
-    });
+        });
 
     if npm_script.is_some() {
         let script = npm_script.unwrap();
