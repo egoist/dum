@@ -1,3 +1,7 @@
+## Unreleased
+
+- Ability to select npm scripts interactively, with `-i, --interactive` flag
+
 ## v0.1.12
 
 - Properly concat `$PATH` on Windows. [#24](https://github.com/egoist/dum/issues/24)

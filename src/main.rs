@@ -1,9 +1,13 @@
-use dum::{dum, parse_args};
+mod args;
+mod install;
+mod prompt;
+mod run;
+
 use std::env;
 
 fn main() {
     let args_vec: Vec<String> = env::args().collect();
-    let args = parse_args(&args_vec[1..]);
+    let args = args::parse_args(&args_vec[1..]);
 
-    dum(&args);
+    run::run(&args);
 }

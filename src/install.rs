@@ -1,5 +1,4 @@
-use dialoguer::console::Term;
-use dialoguer::{theme::ColorfulTheme, Select};
+use crate::prompt;
 use std::path::PathBuf;
 
 // A function to guess package manager by looking for lock file in current directory only
@@ -24,16 +23,5 @@ pub fn guess_package_manager(dir: &PathBuf) -> Option<String> {
     }
 
     let items = vec!["pnpm", "npm", "yarn"];
-    let selection = Select::with_theme(&ColorfulTheme::default())
-        .with_prompt("Which package manager do you want to use?")
-        .items(&items)
-        .default(0)
-        .interact_on_opt(&Term::stderr())
-        .ok()?;
-
-    if selection.is_none() {
-        return None;
-    }
-
-    Some(items[selection.unwrap()].to_string())
+    prompt::select("Which package manager do you want to use?", items)
 }

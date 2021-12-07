@@ -8,6 +8,7 @@ pub struct AppArgs {
     pub forwared: String,
     pub change_dir: PathBuf,
     pub command: String,
+    pub interactive: bool,
 }
 
 pub fn parse_args(args_vec: &[String]) -> AppArgs {
@@ -18,6 +19,7 @@ pub fn parse_args(args_vec: &[String]) -> AppArgs {
         change_dir: PathBuf::from(env::current_dir().as_ref().unwrap()),
         forwared: "".to_string(),
         command: "".to_string(),
+        interactive: false,
     };
 
     loop {
@@ -40,6 +42,9 @@ pub fn parse_args(args_vec: &[String]) -> AppArgs {
                                     std::process::exit(1);
                                 }
                                 args.change_dir = dir;
+                            }
+                            "-i" | "--interactive" => {
+                                args.interactive = true;
                             }
                             "-h" | "--help" => {
                                 print!("{}", get_help());
@@ -68,6 +73,10 @@ pub fn parse_args(args_vec: &[String]) -> AppArgs {
                         _ => v.to_string(),
                     };
                 } else {
+                    if args.interactive {
+                        eprintln!("You can't pass arguments to interactive mode");
+                        exit(1);
+                    }
                     args.forwared.push_str(" ");
                     args.forwared.push_str(&v);
                 }
@@ -103,6 +112,7 @@ COMMANDS:
 
 FLAGS:
     -c <dir>              Change working directory
+    -i, --interactive     Interactive mode
     -h, --help            Prints help information
     -v, --version         Prints version number
 ",

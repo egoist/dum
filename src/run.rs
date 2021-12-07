@@ -1,8 +1,4 @@
-mod args;
-mod install;
-
-// Re-export
-pub use crate::args::parse_args;
+use crate::{args, install, prompt};
 
 use serde_json::Value;
 use std::collections::HashMap;
@@ -83,10 +79,10 @@ fn resolve_bin_path(bin_name: &str, dirs: &Vec<PathBuf>) -> Option<PathBuf> {
     None
 }
 
-pub fn dum(app_args: &args::AppArgs) {
+pub fn run(app_args: &args::AppArgs) {
     let pkg_paths = find_closest_files(&app_args.change_dir, "package.json", true);
     let pkg_path = if pkg_paths.is_empty() {
-        println!("No package.json found");
+        eprintln!("No package.json found");
         exit(1);
     } else {
         pkg_paths[0].clone()
@@ -104,27 +100,51 @@ pub fn dum(app_args: &args::AppArgs) {
     let contents = read_to_string(pkg_path).expect("failed to read package.json");
     let v: Value = serde_json::from_str(&contents).expect("failed to parse package.json");
 
-    if app_args.command == "run" && app_args.script_name.is_empty() {
-        if let Some(scripts) = v["scripts"].as_object() {
-            println!("\nAvailable scripts:\n");
-            for (name, value) in scripts {
-                println!("{}", name);
-                println!("  {}", value);
-            }
-        } else {
-            println!("No scripts found.");
+    let scripts = v["scripts"].as_object();
+    if scripts.is_none() {
+        println!("No scripts found.");
+        return;
+    }
+
+    let mut script_name = app_args.script_name.clone();
+    let mut forwarded = app_args.forwared.clone();
+
+    if !app_args.interactive && app_args.command == "run" && script_name.is_empty() {
+        println!("\nAvailable scripts:\n");
+        for (name, value) in scripts.unwrap() {
+            println!("{}", name);
+            println!("  {}", value);
         }
         return;
     }
 
-    if app_args.script_name.is_empty() {
-        println!("No script name specified.\n");
-        println!("{}", args::get_help());
-        return;
+    if !script_name.is_empty() && app_args.interactive {
+        eprintln!("You can't specify script name in interactive mode");
+        exit(1);
+    }
+
+    if script_name.is_empty() {
+        if !app_args.interactive {
+            println!("No script name specified.\n");
+            println!("{}", args::get_help());
+            return;
+        }
+
+        // Choose an script interactively
+        // Convert keys of scripts to a vector of &str
+        let names_vec = scripts
+            .unwrap()
+            .keys()
+            .map(|k| k.as_str())
+            .collect::<Vec<&str>>();
+        script_name =
+            prompt::select("Select an npm script to run", names_vec).expect("nothing was selected");
+        forwarded = " ".to_string();
+        forwarded.push_str(&prompt::input("Enter arguments to pass to the script"));
     }
 
     // Run npm install if the script_name is "install"
-    if ["install", "add", "remove"].contains(&app_args.script_name.as_str()) {
+    if ["install", "add", "remove"].contains(&script_name.as_str()) {
         let pm = install::guess_package_manager(&execute_dir);
 
         if pm.is_none() {
@@ -133,7 +153,7 @@ pub fn dum(app_args: &args::AppArgs) {
         }
 
         run_command(
-            &[&pm.unwrap(), &app_args.script_name, &app_args.forwared],
+            &[&pm.unwrap(), &script_name, &forwarded],
             &RunOptions {
                 current_dir: execute_dir,
                 envs: HashMap::new(),
@@ -142,24 +162,20 @@ pub fn dum(app_args: &args::AppArgs) {
         return;
     }
 
-    let npm_script = v.get("scripts").and_then(|scripts| {
-        scripts.as_object().and_then(|scripts| {
-            scripts
-                .get(app_args.script_name.as_str())
-                .and_then(|script| {
-                    let script = script.as_str().map(|script| script.to_string());
-                    Some(script.unwrap_or_default())
-                })
+    let npm_script = scripts.and_then(|scripts| {
+        scripts.get(script_name.as_str()).and_then(|script| {
+            let script = script.as_str().map(|script| script.to_string());
+            Some(script.unwrap_or_default())
         })
     });
 
     if npm_script.is_some() {
         let script = npm_script.unwrap();
-        println!("> {}", app_args.script_name);
-        println!("> {}{}", script, app_args.forwared);
+        println!("> {}", script_name);
+        println!("> {}{}", script, forwarded);
         let envs = HashMap::from([("PATH".to_string(), get_path_env(bin_dirs))]);
         run_command(
-            &[&script, &app_args.forwared],
+            &[&script, &forwarded],
             &RunOptions {
                 current_dir: execute_dir,
                 envs,
@@ -168,14 +184,14 @@ pub fn dum(app_args: &args::AppArgs) {
         return;
     }
 
-    let resolved_bin = resolve_bin_path(app_args.script_name.as_str(), &bin_dirs);
+    let resolved_bin = resolve_bin_path(script_name.as_str(), &bin_dirs);
     if resolved_bin.is_some() {
         let bin_path = resolved_bin.unwrap();
-        println!("> {}", app_args.script_name);
-        println!("> {}{}", bin_path.to_str().unwrap(), app_args.forwared);
+        println!("> {}", script_name);
+        println!("> {}{}", bin_path.to_str().unwrap(), forwarded);
         let envs = HashMap::from([("PATH".to_string(), get_path_env(bin_dirs))]);
         run_command(
-            &[bin_path.to_str().unwrap(), &app_args.forwared],
+            &[bin_path.to_str().unwrap(), &forwarded],
             &RunOptions {
                 current_dir: execute_dir,
                 envs,
