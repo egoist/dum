@@ -1,3 +1,7 @@
+## v0.1.17
+
+- fixed a regression where `dum <bin>` stopped working
+
 ## v0.1.16
 
 - Resolve `-c <dir>` to absolute path, previously it always searches package.json from current directory even if `-c` contains `../`.

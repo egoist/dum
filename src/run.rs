@@ -129,11 +129,6 @@ pub fn run(app_args: &args::AppArgs) {
     let v: Value = serde_json::from_str(&contents).expect("failed to parse package.json");
 
     let scripts = v["scripts"].as_object();
-    if scripts.is_none() {
-        println!("No scripts found.");
-        return;
-    }
-
     let mut script_name = app_args.script_name.clone();
     let mut forwarded = app_args.forwarded.clone();
 
@@ -156,6 +151,11 @@ pub fn run(app_args: &args::AppArgs) {
             println!("No script name specified.\n");
             println!("{}", args::get_help());
             return;
+        }
+
+        if scripts.is_none() {
+            eprintln!("No scripts found in package.json");
+            exit(1);
         }
 
         // Choose an script interactively
@@ -185,13 +185,11 @@ pub fn run(app_args: &args::AppArgs) {
     }
 
     let npm_script = scripts
-        .unwrap()
-        .get(script_name.as_str())
+        .and_then(|s| s.get(script_name.as_str()))
         .and_then(|script| {
             let script = script.as_str().map(|script| script.to_string());
             Some(script.unwrap_or_default())
         });
-
     if npm_script.is_some() {
         let script = npm_script.unwrap();
         println!(
@@ -215,7 +213,6 @@ pub fn run(app_args: &args::AppArgs) {
         );
         return;
     }
-
     let resolved_bin = resolve_bin_path(script_name.as_str(), &bin_dirs);
     if resolved_bin.is_some() {
         let bin_path = resolved_bin.unwrap();
