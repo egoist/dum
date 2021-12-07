@@ -1,5 +1,9 @@
 use crate::{args, install, prompt};
 
+use ansi_term::{
+    Color::{Purple, Red},
+    Style,
+};
 use serde_json::Value;
 use std::collections::HashMap;
 use std::env;
@@ -171,8 +175,17 @@ pub fn run(app_args: &args::AppArgs) {
 
     if npm_script.is_some() {
         let script = npm_script.unwrap();
-        println!("> {}", script_name);
-        println!("> {}{}", script, forwarded);
+        println!(
+            "{} {}",
+            Purple.dimmed().paint("$"),
+            Style::new().bold().dimmed().paint(script_name)
+        );
+        println!(
+            "{} {}{}",
+            Purple.dimmed().paint("$"),
+            Style::new().bold().dimmed().paint(&script),
+            Style::new().bold().dimmed().paint(&forwarded),
+        );
         let envs = HashMap::from([("PATH".to_string(), get_path_env(bin_dirs))]);
         run_command(
             &[&script, &forwarded],
@@ -200,7 +213,8 @@ pub fn run(app_args: &args::AppArgs) {
         return;
     }
 
-    println!("No script found.");
+    // TODO: a custom logger module
+    println!("{}", Red.normal().paint("No script found."));
     println!("To see a list of scripts, run `dum run`");
     exit(1);
 }
