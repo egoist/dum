@@ -138,6 +138,7 @@ FLAGS:
 #[cfg(test)]
 mod tests {
     use super::*;
+    use path_absolutize::Absolutize;
 
     macro_rules! vec_of_strings {
         // match a list of expressions separated by comma:
@@ -159,7 +160,7 @@ mod tests {
     fn test_parse_own_flags() {
         let args = parse_args(&vec_of_strings!["-c", ".", "a"]);
         assert_eq!(args.script_name, "a".to_string());
-        assert_eq!(args.change_dir, PathBuf::from("."));
+        assert_eq!(args.change_dir, Path::new(".").absolutize().unwrap());
         assert_eq!(args.forwarded, "".to_string());
     }
 }
