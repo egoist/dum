@@ -1,4 +1,4 @@
-## Unreleased
+## v0.1.13
 
 - Ability to select npm scripts interactively, with `-i, --interactive` flag
 
