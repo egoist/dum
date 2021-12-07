@@ -61,6 +61,7 @@ fn run_command(args: &[&str], options: &RunOptions) {
         ("sh", "-c")
     };
 
+    // assign the value of options.current_dir to current_dir
     let status = Command::new(sh)
         .arg(sh_flag)
         .arg(args.join(" "))
@@ -84,6 +85,24 @@ fn resolve_bin_path(bin_name: &str, dirs: &Vec<PathBuf>) -> Option<PathBuf> {
 }
 
 pub fn run(app_args: &args::AppArgs) {
+    if args::COMMANDS_TO_FORWARD.contains(&app_args.command.as_str()) {
+        let pm = install::guess_package_manager(&app_args.change_dir);
+
+        if pm.is_none() {
+            eprintln!("Aborted.");
+            exit(1);
+        }
+
+        run_command(
+            &[&pm.unwrap(), &app_args.command, &app_args.forwared],
+            &RunOptions {
+                current_dir: app_args.change_dir.clone(),
+                envs: HashMap::new(),
+            },
+        );
+        return;
+    }
+
     let pkg_paths = find_closest_files(&app_args.change_dir, "package.json", true);
     let pkg_path = if pkg_paths.is_empty() {
         eprintln!("No package.json found");
@@ -141,29 +160,23 @@ pub fn run(app_args: &args::AppArgs) {
             .keys()
             .map(|k| k.as_str())
             .collect::<Vec<&str>>();
-        script_name =
-            prompt::select("Select an npm script to run", names_vec).expect("nothing was selected");
+        script_name = match prompt::select("Select an npm script to run", names_vec) {
+            Some(name) => name,
+            None => {
+                println!("No script selected.");
+                return;
+            }
+        };
         forwarded = " ".to_string();
-        forwarded.push_str(&prompt::input("Enter arguments to pass to the script"));
-    }
-
-    // Run npm install if the script_name is "install"
-    if ["install", "add", "remove"].contains(&script_name.as_str()) {
-        let pm = install::guess_package_manager(&execute_dir);
-
-        if pm.is_none() {
-            eprintln!("No package manager found.");
-            exit(1);
-        }
-
-        run_command(
-            &[&pm.unwrap(), &script_name, &forwarded],
-            &RunOptions {
-                current_dir: execute_dir,
-                envs: HashMap::new(),
+        forwarded.push_str(
+            match &prompt::input("Enter arguments to pass to the script") {
+                Some(args) => args,
+                None => {
+                    println!("Aborted.");
+                    return;
+                }
             },
         );
-        return;
     }
 
     let npm_script = scripts

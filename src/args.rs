@@ -11,6 +11,8 @@ pub struct AppArgs {
     pub interactive: bool,
 }
 
+pub const COMMANDS_TO_FORWARD: &'static [&str] = &["install", "i", "add", "remove", "uninstall"];
+
 pub fn parse_args(args_vec: &[String]) -> AppArgs {
     let mut args_iter = args_vec.into_iter();
 
@@ -64,12 +66,14 @@ pub fn parse_args(args_vec: &[String]) -> AppArgs {
                         args.forwared.push_str(" ");
                         args.forwared.push_str(&v);
                     }
-                } else if v == "run" {
-                    args.command = v.to_string();
+                } else if COMMANDS_TO_FORWARD.contains(&v.as_str()) {
+                    args.command = match v.as_ref() {
+                        "i" => "install".to_string(),
+                        _ => v.to_string(),
+                    };
                 } else if args.script_name.is_empty() {
                     args.script_name = match v.as_ref() {
                         "t" => "test".to_string(),
-                        "i" => "install".to_string(),
                         _ => v.to_string(),
                     };
                 } else {

@@ -1,3 +1,8 @@
+## v0.1.14
+
+- Commands like `install` `uninstall` `add` are now handled before npm scripts, previously if there're no scripts or no package.json the command will not be executed.
+- Properly restore cursor after `ctrl-c`.
+
 ## v0.1.13
 
 - Ability to select npm scripts interactively, with `-i, --interactive` flag
