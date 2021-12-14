@@ -15,10 +15,10 @@ pub struct AppArgs {
     pub interactive: bool,
 }
 
-pub const COMMANDS_TO_FORWARD: &'static [&str] = &["install", "i", "add", "remove", "uninstall"];
+pub const COMMANDS_TO_FORWARD: &[&str] = &["install", "i", "add", "remove", "uninstall"];
 
 pub fn parse_args(args_vec: &[String]) -> AppArgs {
-    let mut args_iter = args_vec.into_iter();
+    let mut args_iter = args_vec.iter();
 
     let mut args = AppArgs {
         script_name: "".to_string(),
@@ -33,12 +33,12 @@ pub fn parse_args(args_vec: &[String]) -> AppArgs {
         match arg {
             Some(v) => {
                 if v == "--" {
-                    args.forwarded.push_str(" ");
+                    args.forwarded.push(' ');
                     args.forwarded
                         .push_str(args_iter.as_slice().join(" ").as_str());
                     break;
                 }
-                if v.starts_with("-") {
+                if v.starts_with('-') {
                     if args.script_name.is_empty()
                         && (args.command.is_empty() || args.command == "run")
                     {
@@ -75,8 +75,8 @@ pub fn parse_args(args_vec: &[String]) -> AppArgs {
                         }
                     } else {
                         // forwarded flags
-                        args.forwarded.push_str(" ");
-                        args.forwarded.push_str(&v);
+                        args.forwarded.push(' ');
+                        args.forwarded.push_str(v);
                     }
                 } else if args.command.is_empty()
                     && (COMMANDS_TO_FORWARD.contains(&v.as_str()) || v == "run")
@@ -98,8 +98,8 @@ pub fn parse_args(args_vec: &[String]) -> AppArgs {
                         eprintln!("You can't pass arguments to interactive mode");
                         exit(1);
                     }
-                    args.forwarded.push_str(" ");
-                    args.forwarded.push_str(&v);
+                    args.forwarded.push(' ');
+                    args.forwarded.push_str(v);
                 }
             }
             None => break,

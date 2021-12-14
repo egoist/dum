@@ -1,12 +1,12 @@
 use crate::prompt;
-use std::path::PathBuf;
+use std::path::Path;
 
 // A function to guess package manager by looking for lock file in current directory only
 // If yarn.lock is found, it's likely to be a yarn project
 // If package-lock.json is found, it's likely to be a npm project
 // If pnpm-lock.yaml is found, it's likely to be a pnpm project
 // If none of the above is found, return None
-pub fn guess_package_manager(dir: &PathBuf) -> Option<String> {
+pub fn guess_package_manager(dir: &Path) -> Option<String> {
     let lock_file = dir.join("yarn.lock");
     if lock_file.exists() {
         return Some("yarn".to_string());

@@ -9,7 +9,7 @@ use serde_json::Value;
 use std::collections::HashMap;
 use std::env;
 use std::fs::read_to_string;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use std::process::{exit, Command};
 
 // Get PATH env and join it with bin_dir
@@ -29,9 +29,9 @@ fn get_path_env(bin_dirs: Vec<PathBuf>) -> String {
 // A function to find the closest file
 // Starting from current directory
 // Recusively until it finds the file or reach root directory
-fn find_closest_files(_current_dir: &PathBuf, name: &str, stop_on_first: bool) -> Vec<PathBuf> {
+fn find_closest_files(_current_dir: &Path, name: &str, stop_on_first: bool) -> Vec<PathBuf> {
     let mut closest_file: Vec<PathBuf> = Vec::new();
-    let mut current_dir = _current_dir.clone();
+    let mut current_dir = Path::new(_current_dir);
     loop {
         let path = current_dir.join(name);
 
@@ -42,7 +42,7 @@ fn find_closest_files(_current_dir: &PathBuf, name: &str, stop_on_first: bool) -
             }
         }
         match current_dir.parent() {
-            Some(p) => current_dir = p.to_path_buf(),
+            Some(p) => current_dir = p,
             None => break,
         }
     }
@@ -74,7 +74,7 @@ fn run_command(args: &[&str], options: &RunOptions) {
     exit(status.code().unwrap_or(1));
 }
 
-fn resolve_bin_path(bin_name: &str, dirs: &Vec<PathBuf>) -> Option<PathBuf> {
+fn resolve_bin_path(bin_name: &str, dirs: &[PathBuf]) -> Option<PathBuf> {
     for dir in dirs {
         let path = dir.join(bin_name);
         if path.exists() {
@@ -165,12 +165,20 @@ pub fn run(app_args: &args::AppArgs) {
     let mut forwarded = app_args.forwarded.clone();
 
     if !app_args.interactive && app_args.command == "run" && script_name.is_empty() {
-        println!("\nAvailable scripts:\n");
-        for (name, value) in scripts.unwrap() {
-            println!("{}", name);
-            println!("  {}", value);
+        match scripts {
+            Some(scripts) => {
+                println!("\n{}:\n", Style::new().bold().paint("Available scripts"));
+                for (name, value) in scripts {
+                    println!("{}", Purple.paint(name));
+                    println!("  {}", value.as_str().unwrap());
+                }
+                return;
+            }
+            None => {
+                eprintln!("No scripts found");
+                exit(1);
+            }
         }
-        return;
     }
 
     if !script_name.is_empty() && app_args.interactive {
@@ -218,12 +226,12 @@ pub fn run(app_args: &args::AppArgs) {
 
     let npm_script = scripts
         .and_then(|s| s.get(script_name.as_str()))
-        .and_then(|script| {
+        .map(|script| {
             let script = script.as_str().map(|script| script.to_string());
-            Some(script.unwrap_or_default())
+            script.unwrap_or_default()
         });
-    if npm_script.is_some() {
-        let script = replace_run_commands(&npm_script.unwrap());
+    if let Some(script) = npm_script {
+        let script = replace_run_commands(&script);
         print_script_info(&script_name, &script, &forwarded);
         let envs = HashMap::from([("PATH".to_string(), get_path_env(bin_dirs))]);
         run_command(
@@ -236,9 +244,8 @@ pub fn run(app_args: &args::AppArgs) {
         return;
     }
     let resolved_bin = resolve_bin_path(script_name.as_str(), &bin_dirs);
-    if resolved_bin.is_some() {
-        let bin_path = resolved_bin.unwrap();
-        print_script_info(&script_name, &bin_path.to_str().unwrap(), &forwarded);
+    if let Some(bin_path) = resolved_bin {
+        print_script_info(&script_name, bin_path.to_str().unwrap(), &forwarded);
         let envs = HashMap::from([("PATH".to_string(), get_path_env(bin_dirs))]);
         run_command(
             &[bin_path.to_str().unwrap(), &forwarded],

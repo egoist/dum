@@ -24,9 +24,7 @@ pub fn select(message: &str, script_names: Vec<&str>) -> Option<String> {
 
     show_cursor();
 
-    if selection.is_none() {
-        return None;
-    }
+    selection?;
 
     Some(script_names[selection.unwrap()].to_string())
 }
