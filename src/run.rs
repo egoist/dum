@@ -85,6 +85,23 @@ fn resolve_bin_path(bin_name: &str, dirs: &Vec<PathBuf>) -> Option<PathBuf> {
     None
 }
 
+// Replace npm run / yarn / pnpm run with `dum`
+fn replace_run_commands(script: &str) -> String {
+    let mut dum = "dum";
+    let mut dum_run = "dum run";
+    if cfg!(debug_assertions) {
+        dum = "target/debug/dum";
+        dum_run = "target/debug/dum run";
+    }
+    script
+        .replace("npm run", dum_run)
+        .replace("yarn run", dum_run)
+        .replace("pnpm run", dum_run)
+        .replace("npx", dum)
+        .replace("pnpx", dum)
+        .replace("yarn", dum)
+}
+
 pub fn run(app_args: &args::AppArgs) {
     if args::COMMANDS_TO_FORWARD.contains(&app_args.command.as_str()) {
         debug!("Running command {}", app_args.command);
@@ -191,7 +208,7 @@ pub fn run(app_args: &args::AppArgs) {
             Some(script.unwrap_or_default())
         });
     if npm_script.is_some() {
-        let script = npm_script.unwrap();
+        let script = replace_run_commands(&npm_script.unwrap());
         println!(
             "{} {}",
             Purple.dimmed().paint("$"),

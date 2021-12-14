@@ -32,6 +32,12 @@ pub fn parse_args(args_vec: &[String]) -> AppArgs {
         let arg = args_iter.next();
         match arg {
             Some(v) => {
+                if v == "--" {
+                    args.forwarded.push_str(" ");
+                    args.forwarded
+                        .push_str(args_iter.as_slice().join(" ").as_str());
+                    break;
+                }
                 if v.starts_with("-") {
                     if args.script_name.is_empty()
                         && (args.command.is_empty() || args.command == "run")
