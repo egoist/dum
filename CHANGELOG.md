@@ -1,3 +1,7 @@
+## v0.1.19
+
+- Revert v0.1.18, because some npm/pnpm flags are not supported by dum.
+
 ## v0.1.18
 
 - Replacing `npm run` `yarn` `pnpm run` `npx` `pnpx` in npm script with `dum`.
