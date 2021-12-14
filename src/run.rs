@@ -102,6 +102,21 @@ fn replace_run_commands(script: &str) -> String {
         .replace("yarn", dum)
 }
 
+// Print the script name / script
+fn print_script_info(script_name: &str, script: &str, forwarded: &str) {
+    println!(
+        "{} {}",
+        Purple.dimmed().paint("$"),
+        Style::new().bold().dimmed().paint(script_name)
+    );
+    println!(
+        "{} {}{}",
+        Purple.dimmed().paint("$"),
+        Style::new().bold().dimmed().paint(script),
+        Style::new().bold().dimmed().paint(forwarded),
+    );
+}
+
 pub fn run(app_args: &args::AppArgs) {
     if args::COMMANDS_TO_FORWARD.contains(&app_args.command.as_str()) {
         debug!("Running command {}", app_args.command);
@@ -209,17 +224,7 @@ pub fn run(app_args: &args::AppArgs) {
         });
     if npm_script.is_some() {
         let script = replace_run_commands(&npm_script.unwrap());
-        println!(
-            "{} {}",
-            Purple.dimmed().paint("$"),
-            Style::new().bold().dimmed().paint(script_name)
-        );
-        println!(
-            "{} {}{}",
-            Purple.dimmed().paint("$"),
-            Style::new().bold().dimmed().paint(&script),
-            Style::new().bold().dimmed().paint(&forwarded),
-        );
+        print_script_info(&script_name, &script, &forwarded);
         let envs = HashMap::from([("PATH".to_string(), get_path_env(bin_dirs))]);
         run_command(
             &[&script, &forwarded],
@@ -233,8 +238,7 @@ pub fn run(app_args: &args::AppArgs) {
     let resolved_bin = resolve_bin_path(script_name.as_str(), &bin_dirs);
     if resolved_bin.is_some() {
         let bin_path = resolved_bin.unwrap();
-        println!("> {}", script_name);
-        println!("> {}{}", bin_path.to_str().unwrap(), forwarded);
+        print_script_info(&script_name, &bin_path.to_str().unwrap(), &forwarded);
         let envs = HashMap::from([("PATH".to_string(), get_path_env(bin_dirs))]);
         run_command(
             &[bin_path.to_str().unwrap(), &forwarded],
