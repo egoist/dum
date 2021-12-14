@@ -1,3 +1,8 @@
+## v0.1.18
+
+- Replacing `npm run` `yarn` `pnpm run` `npx` `pnpx` in npm script with `dum`.
+- Tweak log format.
+
 ## v0.1.17
 
 - fixed a regression where `dum <bin>` stopped working
