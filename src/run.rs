@@ -28,7 +28,7 @@ fn get_path_env(bin_dirs: Vec<PathBuf>) -> String {
 
 // A function to find the closest file
 // Starting from current directory
-// Recusively until it finds the file or reach root directory
+// Recursively until it finds the file or reach root directory
 fn find_closest_files(_current_dir: &Path, name: &str, stop_on_first: bool) -> Vec<PathBuf> {
     let mut closest_file: Vec<PathBuf> = Vec::new();
     let mut current_dir = Path::new(_current_dir);
@@ -111,7 +111,7 @@ pub fn run(app_args: &args::AppArgs) {
         }
 
         run_command(
-            &[&pm.unwrap(), &app_args.command, &app_args.forwarded],
+            &[&pm.unwrap().to_string(), &app_args.command, &app_args.forwarded],
             &RunOptions {
                 current_dir: app_args.change_dir.clone(),
                 envs: HashMap::new(),
