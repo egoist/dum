@@ -113,14 +113,14 @@ jobs:
 
       - name: Upload artifacts archive
         if: ${{ startsWith(github.ref, 'refs/tags/v') }}
-        uses: actions/upload-artifact@v1
+        uses: actions/upload-artifact@v2
         with:
           name: dum-${{ matrix.target }}.${{ matrix.archive }}
           path: dum-${{ matrix.target }}.${{ matrix.archive }}
 
       - name: Upload artifacts checksum
         if: ${{ startsWith(github.ref, 'refs/tags/v') }}
-        uses: actions/upload-artifact@v1
+        uses: actions/upload-artifact@v2
         with:
           name: dum-${{ matrix.target }}-sha256sum.txt
           path: dum-${{ matrix.target }}-sha256sum.txt
