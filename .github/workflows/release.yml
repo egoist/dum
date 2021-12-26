@@ -54,7 +54,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-      - uses: FranzDiebold/github-env-vars-action@v1.2.1
+      - uses: FranzDiebold/github-env-vars-action@v1.3.0
 
       - name: Install coreutils for macOS
         if: matrix.os == 'macos-latest'
