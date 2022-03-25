@@ -19,7 +19,7 @@ pub async fn update_check() -> Result<(), reqwest::Error> {
         .json::<Answer>()
         .await?;
     let version = answer.tag_name.replace('v', "");
-    if env!("CARGO_PKG_VERSION") == version {
+    if env!("CARGO_PKG_VERSION") != version {
         println!(
             "{} {}",
             Red.normal().paint("There is a new version of dum:"),
