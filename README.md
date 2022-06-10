@@ -38,6 +38,14 @@ Benchmark (`hyperfine "dum foo" "npm run foo" --warmup 10`):
 brew install egoist/tap/dum
 ```
 
+### Arch Linux AUR
+
+```bash
+yay -S dum
+```
+
+Check <https://aur.archlinux.org/packages/dum> for version info.
+
 ### Shell
 
 ```bash
