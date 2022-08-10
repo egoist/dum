@@ -1,4 +1,5 @@
 use crate::{args, install, prompt};
+use shlex;
 
 use ansi_term::{
     Color::{Purple, Red},
@@ -55,17 +56,25 @@ struct RunOptions {
     current_dir: PathBuf,
 }
 
-fn run_command(args: &[&str], options: &RunOptions) {
-    let (sh, sh_flag) = if cfg!(target_os = "windows") {
-        ("cmd", "/C")
-    } else {
-        ("sh", "-c")
+fn run_command(script: &str, args: &[&str], options: &RunOptions) {
+    let mut command = {
+        if cfg!(target_os = "windows") {
+            let mut command = Command::new("cmd");
+            command.arg("/C").arg(script);
+            command
+        } else {
+            let mut command = Command::new("sh");
+            command
+                .arg("-c")
+                .arg(format!("{} \"$@\"", script))
+                .arg("sh");
+            command
+        }
     };
 
     // assign the value of options.current_dir to current_dir
-    let status = Command::new(sh)
-        .arg(sh_flag)
-        .arg(args.join(" "))
+    let status = command
+        .args(args)
         .envs(&options.envs)
         .current_dir(&options.current_dir)
         .status()
@@ -86,21 +95,21 @@ fn resolve_bin_path(bin_name: &str, dirs: &[PathBuf]) -> Option<PathBuf> {
 }
 
 // Print the script name / script
-fn print_script_info(script_name: &str, script: &str, forwarded: &str) {
+fn print_script_info(script_name: &str, script: &str, forwarded: &[&str]) {
     println!(
         "{} {}",
         Purple.dimmed().paint("$"),
         Style::new().bold().dimmed().paint(script_name)
     );
     println!(
-        "{} {}{}",
+        "{} {} {}",
         Purple.dimmed().paint("$"),
         Style::new().bold().dimmed().paint(script),
-        Style::new().bold().dimmed().paint(forwarded),
+        Style::new().bold().dimmed().paint(shlex::join(forwarded.to_vec())),
     );
 }
 
-pub fn run(app_args: &args::AppArgs) {
+pub fn run(app_args: args::AppArgs) {
     if args::COMMANDS_TO_FORWARD.contains(&app_args.command.as_str()) {
         debug!("Running command {}", app_args.command);
         let pm = install::guess_package_manager(&app_args.change_dir);
@@ -109,9 +118,15 @@ pub fn run(app_args: &args::AppArgs) {
             eprintln!("Aborted.");
             exit(1);
         }
+        let args = vec![app_args.command.as_str()];
+        let args: Vec<&str> = args
+            .into_iter()
+            .chain(app_args.forwarded.iter().map(|s| s.as_str()))
+            .collect();
 
         run_command(
-            &[&pm.unwrap().to_string(), &app_args.command, &app_args.forwarded],
+            pm.unwrap().to_string().as_str(),
+            &args,
             &RunOptions {
                 current_dir: app_args.change_dir.clone(),
                 envs: HashMap::new(),
@@ -144,8 +159,8 @@ pub fn run(app_args: &args::AppArgs) {
     let v: Value = serde_json::from_str(&contents).expect("failed to parse package.json");
 
     let scripts = v["scripts"].as_object();
-    let mut script_name = app_args.script_name.clone();
-    let mut forwarded = app_args.forwarded.clone();
+    let mut script_name = app_args.script_name;
+    let mut forwarded = app_args.forwarded;
 
     if !app_args.interactive && app_args.command == "run" && script_name.is_empty() {
         match scripts {
@@ -195,18 +210,28 @@ pub fn run(app_args: &args::AppArgs) {
                 return;
             }
         };
-        forwarded = " ".to_string();
-        forwarded.push_str(
-            match &prompt::input("Enter arguments to pass to the script") {
-                Some(args) => args,
+        let mut arguments: Option<Vec<String>> =
+            match prompt::input("Enter arguments to pass to the script") {
+                Some(args) => shlex::split(&args),
                 None => {
                     println!("Aborted.");
                     return;
                 }
-            },
-        );
+            };
+        while let None = arguments {
+            eprintln!("Error while parsing arguments: please check the the validity of the arguments and try again");
+            arguments = match prompt::input("Enter arguments to pass to the script") {
+                Some(args) => shlex::split(&args),
+                None => {
+                    println!("Aborted.");
+                    return;
+                }
+            };
+        }
+        forwarded.extend(arguments.unwrap());
     }
 
+    let forwarded: Vec<&str> = forwarded.iter().map(|s| s.as_str()).collect();
     let npm_script = scripts
         .and_then(|s| s.get(script_name.as_str()))
         .map(|script| {
@@ -217,7 +242,8 @@ pub fn run(app_args: &args::AppArgs) {
         print_script_info(&script_name, &script, &forwarded);
         let envs = HashMap::from([("PATH".to_string(), get_path_env(bin_dirs))]);
         run_command(
-            &[&script, &forwarded],
+            script.as_str(),
+            &forwarded,
             &RunOptions {
                 current_dir: execute_dir,
                 envs,
@@ -230,7 +256,8 @@ pub fn run(app_args: &args::AppArgs) {
         print_script_info(&script_name, bin_path.to_str().unwrap(), &forwarded);
         let envs = HashMap::from([("PATH".to_string(), get_path_env(bin_dirs))]);
         run_command(
-            &[bin_path.to_str().unwrap(), &forwarded],
+            bin_path.to_str().unwrap(),
+            &forwarded,
             &RunOptions {
                 current_dir: execute_dir,
                 envs,
