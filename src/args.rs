@@ -9,7 +9,7 @@ use path_absolutize::Absolutize;
 #[derive(Debug)]
 pub struct AppArgs {
     pub script_name: String,
-    pub forwarded: String,
+    pub forwarded: Vec<String>,
     pub change_dir: PathBuf,
     pub command: String,
     pub interactive: bool,
@@ -17,13 +17,13 @@ pub struct AppArgs {
 
 pub const COMMANDS_TO_FORWARD: &[&str] = &["install", "i", "add", "remove", "uninstall"];
 
-pub fn parse_args(args_vec: &[String]) -> AppArgs {
-    let mut args_iter = args_vec.iter();
+pub fn parse_args(args_vec: Vec<String>) -> AppArgs {
+    let mut args_iter = args_vec.into_iter();
 
     let mut args = AppArgs {
         script_name: "".to_string(),
         change_dir: PathBuf::from(env::current_dir().as_ref().unwrap()),
-        forwarded: "".to_string(),
+        forwarded: vec![],
         command: "".to_string(),
         interactive: false,
     };
@@ -33,9 +33,7 @@ pub fn parse_args(args_vec: &[String]) -> AppArgs {
         match arg {
             Some(v) => {
                 if v == "--" {
-                    args.forwarded.push(' ');
-                    args.forwarded
-                        .push_str(args_iter.as_slice().join(" ").as_str());
+                    args.forwarded.extend(args_iter);
                     break;
                 }
                 if v.starts_with('-') {
@@ -45,7 +43,7 @@ pub fn parse_args(args_vec: &[String]) -> AppArgs {
                         match v.as_ref() {
                             "-c" => {
                                 let dir = match args_iter.next() {
-                                    Some(v) => PathBuf::from(Path::new(v).absolutize().unwrap()),
+                                    Some(v) => PathBuf::from(Path::new(&v).absolutize().unwrap()),
                                     None => {
                                         println!("No directory specified");
                                         exit(1);
@@ -74,9 +72,7 @@ pub fn parse_args(args_vec: &[String]) -> AppArgs {
                             }
                         }
                     } else {
-                        // forwarded flags
-                        args.forwarded.push(' ');
-                        args.forwarded.push_str(v);
+                        args.forwarded.push(v);
                     }
                 } else if args.command.is_empty()
                     && (COMMANDS_TO_FORWARD.contains(&v.as_str()) || v == "run")
@@ -98,14 +94,12 @@ pub fn parse_args(args_vec: &[String]) -> AppArgs {
                         eprintln!("You can't pass arguments to interactive mode");
                         exit(1);
                     }
-                    args.forwarded.push(' ');
-                    args.forwarded.push_str(v);
+                    args.forwarded.push(v);
                 }
             }
             None => break,
         }
     }
-
     args
 }
 
@@ -157,16 +151,16 @@ mod tests {
 
     #[test]
     fn test_parse() {
-        let args = parse_args(&vec_of_strings!["a", "b", "-c", "-d", "foo", "bar"]);
+        let args = parse_args(vec_of_strings!["a", "b", "-c", "-d", "foo", "bar"]);
         assert_eq!(args.script_name, "a".to_string());
-        assert_eq!(args.forwarded, " b -c -d foo bar".to_string());
+        assert_eq!(args.forwarded, vec!["b", "-c", "-d", "foo", "bar"]);
     }
 
     #[test]
     fn test_parse_own_flags() {
-        let args = parse_args(&vec_of_strings!["-c", ".", "a"]);
+        let args = parse_args(vec_of_strings!["-c", ".", "a"]);
         assert_eq!(args.script_name, "a".to_string());
         assert_eq!(args.change_dir, Path::new(".").absolutize().unwrap());
-        assert_eq!(args.forwarded, "".to_string());
+        assert_eq!(args.forwarded, Vec::<&str>::new());
     }
 }
