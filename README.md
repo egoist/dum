@@ -56,6 +56,12 @@ cargo install dum
 scoop install dum
 ```
 
+### AUR
+
+```bash
+paru -S dum
+```
+
 ### GitHub Releases
 
 [Download a release manually](https://github.com/egoist/dum/releases) and move it to `/usr/local/bin` manually.
