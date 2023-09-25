@@ -214,7 +214,9 @@ pub fn run(app_args: &args::AppArgs) {
             script.unwrap_or_default()
         });
     if let Some(script) = npm_script {
-        print_script_info(&script_name, &script, &forwarded);
+        if !app_args.silent {
+            print_script_info(&script_name, &script, &forwarded);
+        }
         let envs = HashMap::from([("PATH".to_string(), get_path_env(bin_dirs))]);
         run_command(
             &[&script, &forwarded],
@@ -227,7 +229,9 @@ pub fn run(app_args: &args::AppArgs) {
     }
     let resolved_bin = resolve_bin_path(script_name.as_str(), &bin_dirs);
     if let Some(bin_path) = resolved_bin {
-        print_script_info(&script_name, bin_path.to_str().unwrap(), &forwarded);
+        if !app_args.silent {
+            print_script_info(&script_name, bin_path.to_str().unwrap(), &forwarded);
+        }
         let envs = HashMap::from([("PATH".to_string(), get_path_env(bin_dirs))]);
         run_command(
             &[bin_path.to_str().unwrap(), &forwarded],
