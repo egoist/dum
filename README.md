@@ -41,7 +41,7 @@ brew install egoist/tap/dum
 ### Shell
 
 ```bash
-curl -sSL https://bina.egoist.sh/egoist/dum | sh
+curl -sSL https://bina.egoist.dev/egoist/dum | sh
 ```
 
 ### Cargo
