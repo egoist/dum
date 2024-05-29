@@ -13,6 +13,7 @@ pub struct AppArgs {
     pub change_dir: PathBuf,
     pub command: String,
     pub interactive: bool,
+    pub silent: bool,
 }
 
 pub const COMMANDS_TO_FORWARD: &[&str] = &["install", "i", "add", "remove", "uninstall"];
@@ -26,6 +27,7 @@ pub fn parse_args(args_vec: &[String]) -> AppArgs {
         forwarded: "".to_string(),
         command: "".to_string(),
         interactive: false,
+        silent: false,
     };
 
     loop {
@@ -59,6 +61,9 @@ pub fn parse_args(args_vec: &[String]) -> AppArgs {
                             }
                             "-i" | "--interactive" => {
                                 args.interactive = true;
+                            }
+                            "-s" | "--silent" => {
+                                args.silent = true;
                             }
                             "-h" | "--help" => {
                                 print!("{}", get_help());
@@ -134,6 +139,7 @@ COMMANDS:
 FLAGS:
     -c <dir>              Change working directory
     -i, --interactive     Interactive mode
+    -s, --silent          Suppress the script info output
     -h, --help            Prints help information
     -v, --version         Prints version number
 ",
