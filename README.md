@@ -42,6 +42,8 @@ brew install egoist/tap/dum
 
 ```bash
 yay -S dum
+# or
+paru -S dum
 ```
 
 Check <https://aur.archlinux.org/packages/dum> for version info.
