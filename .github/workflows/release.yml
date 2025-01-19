@@ -53,42 +53,21 @@ jobs:
             archive: zip
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - uses: FranzDiebold/github-env-vars-action@v2.3.1
 
       - name: Install coreutils for macOS
         if: matrix.os == 'macos-latest'
         run: brew install coreutils
 
-      # Cache files between builds
-      - name: Setup | Cache Cargo
-        uses: actions/cache@v2.1.7
-        with:
-          path: |
-            ~/.cargo/registry
-            ~/.cargo/git
-          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
-
-      - name: Setup | Rust
-        uses: actions-rs/toolchain@v1
-        with:
-          toolchain: stable
-          profile: minimal
-          target: ${{ matrix.target }}
-          override: true
+      - name: Setup Rust
+        uses: actions-rust-lang/setup-rust-toolchain@v1
 
       - name: Run Tests
         run: cargo test
 
       - name: Build release
-        uses: actions-rs/cargo@v1
-        # TODO: Remove this once it's the default
-        env:
-          SDKROOT: /Library/Developer/CommandLineTools/SDKs/MacOSX11.1.sdk
-        with:
-          command: build
-          args: --target ${{ matrix.target }} --release
-          use-cross: ${{ matrix.os == 'ubuntu-latest' }}
+        run: cargo build --target ${{ matrix.target }} --release
 
       - name: Copy and rename utility
         run: cp target/${{ matrix.target }}/release/${{ matrix.output }} ${{ matrix.output }}
@@ -113,14 +92,14 @@ jobs:
 
       - name: Upload artifacts archive
         if: ${{ startsWith(github.ref, 'refs/tags/v') }}
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: dum-${{ matrix.target }}.${{ matrix.archive }}
           path: dum-${{ matrix.target }}.${{ matrix.archive }}
 
       - name: Upload artifacts checksum
         if: ${{ startsWith(github.ref, 'refs/tags/v') }}
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: dum-${{ matrix.target }}-sha256sum.txt
           path: dum-${{ matrix.target }}-sha256sum.txt
