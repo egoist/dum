@@ -4,6 +4,6 @@
     "test": "echo \"hello test\" && npm run foo -- arg",
     "build-mac": "cargo build --release --target x86_64-apple-darwin && cargo build --release --target aarch64-apple-darwin",
     "build-win": "cargo build --release --target x86_64-pc-windows-msvc",
-    "build-lin": "cargo build --release --target x86_64-unknown-linux-gnu cargo build --release --target armv7-unknown-linux-gnueabihf"
+    "build-lin": "cargo build --release --target x86_64-unknown-linux-gnu && cargo build --release --target armv7-unknown-linux-gnueabihf"
   }
 }
