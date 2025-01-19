@@ -9,6 +9,7 @@ pub enum PackageManager {
     Yarn,
     Npm,
     Pnpm,
+    Bun,
 }
 
 impl ToString for PackageManager {
@@ -17,6 +18,7 @@ impl ToString for PackageManager {
             PackageManager::Yarn => "yarn".to_string(),
             PackageManager::Npm => "npm".to_string(),
             PackageManager::Pnpm => "pnpm".to_string(),
+            PackageManager::Bun => "bun".to_string(),
         }
     }
 }
@@ -29,11 +31,11 @@ impl FromStr for PackageManager {
             "yarn" => Ok(PackageManager::Yarn),
             "npm" => Ok(PackageManager::Npm),
             "pnpm" => Ok(PackageManager::Pnpm),
+            "bun" => Ok(PackageManager::Bun),
             _ => Err(anyhow!("Parse package manager error")),
         }
     }
 }
-
 
 // A function to guess package manager by looking for lock file in current directory only
 // If yarn.lock is found, it's likely to be a yarn project
@@ -56,10 +58,20 @@ pub fn guess_package_manager(dir: &Path) -> Option<PackageManager> {
         return Some(PackageManager::Pnpm);
     }
 
+    // bun supports both bun.lockb and bun.lock
+    let lock_file = dir.join("bun.lockb");
+    if lock_file.exists() {
+        return Some(PackageManager::Bun);
+    }
 
-    let items = vec!["pnpm", "npm", "yarn"];
+    let lock_file = dir.join("bun.lock");
+    if lock_file.exists() {
+        return Some(PackageManager::Bun);
+    }
+
+    let items = vec!["pnpm", "npm", "yarn", "bun"];
     match prompt::select("Which package manager do you want to use?", items) {
         Some(pm) => PackageManager::from_str(&pm).ok(),
-        None => None
+        None => None,
     }
 }

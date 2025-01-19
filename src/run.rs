@@ -105,7 +105,10 @@ fn print_script_info(script_name: &str, script: &str, forwarded: &[&str]) {
         "{} {} {}",
         Purple.dimmed().paint("$"),
         Style::new().bold().dimmed().paint(script),
-        Style::new().bold().dimmed().paint(shlex::join(forwarded.to_vec())),
+        Style::new()
+            .bold()
+            .dimmed()
+            .paint(shlex::try_join(forwarded.to_vec()).unwrap()),
     );
 }
 

@@ -94,7 +94,7 @@ dum --help
 
 ### Install Packages
 
-Dum is not a package manager yet, but we forward `install`, `add`, `remove` commands to npm, pnpm and yarn automatically:
+Dum is not a package manager yet, but we forward `install`, `add`, `remove` commands to the package manager you're currently using:
 
 ```bash
 # Run `npm i` or `yarn` or `pnpm i` depending on the project
@@ -105,6 +105,8 @@ dum add react vue -D
 dum remove react vue
 ```
 
+We detect the package manager automatically by checking for lock files in the current directory. If no lock file is found, we ask you to select a package manager first.
+
 ## Limitations
 
 - [package.json vars](https://docs.npmjs.com/cli/v8/using-npm/scripts#packagejson-vars) are not supported, I personally never used it, if you believe it's necessary, please [leave a comment here](https://github.com/egoist/dum/issues/2).
@@ -112,6 +114,12 @@ dum remove react vue
 ## Inspiration
 
 I want to try and learn Rust so I made this. Inspired by [bun](https://bun.sh/).
+
+## Development
+
+```bash
+cargo run -- <...args to test>
+```
 
 ## Sponsors
 
